@@ -102,7 +102,7 @@ export default function Dashboard() {
                   <SalaryCard month={month} amount={data?.salary ?? 0} onUpdated={onChanged} />
                 </motion.div>
                 <motion.div variants={item} className="md:col-span-12 lg:col-span-7">
-                  <FixedExpensesCard items={data?.fixed_expenses ?? []} onChanged={onChanged} />
+                  <FixedExpensesCard month={month} items={data?.fixed_expenses ?? []} onChanged={onChanged} />
                 </motion.div>
                 <motion.div variants={item} className="md:col-span-12 lg:col-span-5">
                   <CategoryChart byCategory={data?.by_category ?? []} total={data?.extra_total ?? 0} />
