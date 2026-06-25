@@ -22,11 +22,11 @@ export default function SalaryCard({ month, amount, onUpdated }) {
     setSaving(true);
     try {
       await setSalary(month, num);
-      toast.success("Stipendio aggiornato");
+      toast.success("Salary updated");
       setEditing(false);
       onUpdated?.();
     } catch (e) {
-      toast.error("Errore nel salvataggio");
+      toast.error("Error saving salary");
     } finally {
       setSaving(false);
     }
@@ -39,7 +39,7 @@ export default function SalaryCard({ month, amount, onUpdated }) {
     >
       <div className="flex items-center justify-between">
         <p className="text-[10px] uppercase tracking-[0.25em] font-bold text-neutral-500">
-          Stipendio mensile
+          Monthly Salary
         </p>
         {!editing && (
           <button
@@ -49,7 +49,7 @@ export default function SalaryCard({ month, amount, onUpdated }) {
             data-testid="salary-edit-button"
           >
             <Pencil className="w-3.5 h-3.5" />
-            Modifica
+            Edit
           </button>
         )}
       </div>
@@ -60,7 +60,7 @@ export default function SalaryCard({ month, amount, onUpdated }) {
             {formatEUR(amount || 0)}
           </div>
           <p className="mt-3 text-sm text-neutral-500">
-            {amount > 0 ? "Entrata mensile registrata" : "Imposta il tuo stipendio per iniziare"}
+            {amount > 0 ? "Monthly income recorded" : "Set your salary to get started"}
           </p>
         </div>
       ) : (
@@ -88,7 +88,7 @@ export default function SalaryCard({ month, amount, onUpdated }) {
               className="bg-white text-black font-medium px-5 py-2.5 rounded-full hover:bg-neutral-200 transition-colors active:scale-95 inline-flex items-center gap-2 disabled:opacity-50"
               data-testid="salary-save-button"
             >
-              <Check className="w-4 h-4" /> Salva
+              <Check className="w-4 h-4" /> Save
             </button>
             <button
               type="button"
@@ -96,15 +96,15 @@ export default function SalaryCard({ month, amount, onUpdated }) {
               className="border border-white/10 px-5 py-2.5 rounded-full hover:bg-white/5 transition-colors active:scale-95"
               data-testid="salary-cancel-button"
             >
-              Annulla
+              Cancel
             </button>
           </div>
         </div>
       )}
 
       <div className="mt-6 flex items-center justify-between text-xs text-neutral-500">
-        <span className="uppercase tracking-[0.2em] font-bold">Entrate</span>
-        <span className="font-mono-num">EUR · mensile</span>
+        <span className="uppercase tracking-[0.2em] font-bold">Income</span>
+        <span className="font-mono-num">EUR · monthly</span>
       </div>
     </div>
   );

@@ -18,17 +18,17 @@ export default function FixedExpensesCard({ month, items, onChanged }) {
   const save = async () => {
     const num = parseFloat(amount);
     if (!name.trim() || isNaN(num) || num <= 0) {
-      toast.error("Compila nome e importo");
+      toast.error("Fill in name and amount");
       return;
     }
     setSaving(true);
     try {
       await addFixedExpense(month, { name: name.trim(), amount: num });
-      toast.success("Spesa fissa aggiunta");
+      toast.success("Fixed expense added");
       reset();
       onChanged?.();
     } catch (e) {
-      toast.error("Errore nell'aggiunta");
+      toast.error("Error adding fixed expense");
     } finally {
       setSaving(false);
     }
@@ -39,14 +39,14 @@ export default function FixedExpensesCard({ month, items, onChanged }) {
     setDeletingIds((s) => new Set(s).add(id));
     try {
       await deleteFixedExpense(id);
-      toast.success("Spesa eliminata");
+      toast.success("Fixed expense deleted");
       onChanged?.();
     } catch (e) {
       if (e?.response?.status === 404) {
         // already gone — treat as success
         onChanged?.();
       } else {
-        toast.error("Errore nell'eliminazione");
+        toast.error("Error deleting fixed expense");
         setDeletingIds((s) => {
           const next = new Set(s);
           next.delete(id);
@@ -64,12 +64,12 @@ export default function FixedExpensesCard({ month, items, onChanged }) {
       <div className="flex items-start justify-between">
         <div>
           <p className="text-[10px] uppercase tracking-[0.25em] font-bold text-neutral-500 mb-2">
-            Spese Fisse
+            Fixed Expenses
           </p>
           <div className="font-mono-num text-3xl sm:text-4xl tracking-tight text-white" data-testid="fixed-total">
             {formatEUR(total)}
           </div>
-          <p className="text-xs text-neutral-500 mt-1">{items.length} {items.length === 1 ? "voce ricorrente" : "voci ricorrenti"}</p>
+          <p className="text-xs text-neutral-500 mt-1">{items.length} {items.length === 1 ? "recurring item" : "recurring items"}</p>
         </div>
         {!adding && (
           <button
@@ -78,7 +78,7 @@ export default function FixedExpensesCard({ month, items, onChanged }) {
             className="border border-white/10 bg-transparent text-white px-4 py-2 rounded-full hover:bg-white/5 transition-colors active:scale-95 inline-flex items-center gap-1.5 text-sm"
             data-testid="add-fixed-button"
           >
-            <Plus className="w-3.5 h-3.5" /> Aggiungi
+            <Plus className="w-3.5 h-3.5" /> Add
           </button>
         )}
       </div>
@@ -88,14 +88,6 @@ export default function FixedExpensesCard({ month, items, onChanged }) {
           <div className="grid grid-cols-1 sm:grid-cols-5 gap-3">
             <input
               autoFocus
-              type="text"
-              placeholder="Es. Affitto, Bollette..."
-              value={name}
-              onChange={(e) => setName(e.target.value)}
-              className="sm:col-span-3 bg-transparent border border-white/10 rounded-lg px-3 py-2 text-sm focus:border-white outline-none placeholder:text-white/20"
-              data-testid="fixed-name-input"
-            />
-            <input
               type="number"
               step="0.01"
               min="0"
@@ -106,6 +98,14 @@ export default function FixedExpensesCard({ month, items, onChanged }) {
               className="sm:col-span-2 bg-transparent border border-white/10 rounded-lg px-3 py-2 text-sm font-mono-num focus:border-white outline-none placeholder:text-white/20"
               data-testid="fixed-amount-input"
             />
+            <input
+              type="text"
+              placeholder="E.g. Rent, Bills..."
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+              className="sm:col-span-3 bg-transparent border border-white/10 rounded-lg px-3 py-2 text-sm focus:border-white outline-none placeholder:text-white/20"
+              data-testid="fixed-name-input"
+            />
           </div>
           <div className="mt-3 flex gap-2 justify-end">
             <button
@@ -114,7 +114,7 @@ export default function FixedExpensesCard({ month, items, onChanged }) {
               className="text-sm text-neutral-400 hover:text-white px-3 py-1.5 inline-flex items-center gap-1"
               data-testid="fixed-cancel-button"
             >
-              <X className="w-3.5 h-3.5" /> Annulla
+              <X className="w-3.5 h-3.5" /> Cancel
             </button>
             <button
               type="button"
@@ -123,7 +123,7 @@ export default function FixedExpensesCard({ month, items, onChanged }) {
               className="bg-white text-black font-medium text-sm px-4 py-1.5 rounded-full hover:bg-neutral-200 transition-colors active:scale-95 disabled:opacity-50"
               data-testid="fixed-save-button"
             >
-              Salva
+              Save
             </button>
           </div>
         </div>
@@ -132,7 +132,7 @@ export default function FixedExpensesCard({ month, items, onChanged }) {
       <div className="mt-5 flex-1 overflow-y-auto -mx-2" data-testid="fixed-list">
         {items.length === 0 && !adding && (
           <div className="px-2 py-10 text-center text-sm text-neutral-600 border border-dashed border-white/10 rounded-xl">
-            Nessuna spesa fissa.<br />Aggiungi affitto, bollette, abbonamenti…
+            No fixed expenses.<br />Add rent, bills, subscriptions…
           </div>
         )}
         <ul className="divide-y divide-white/5">

@@ -83,10 +83,10 @@ const Tip = ({ active, payload, label }) => {
   const d = payload[0].payload;
   return (
     <div className="bg-[#0A0A0A] border border-white/10 rounded-lg px-3 py-2.5 text-xs space-y-1 min-w-[220px]">
-      <div className="uppercase tracking-[0.18em] text-neutral-500 mb-1.5 font-bold">Anno {label}</div>
-      <div className="flex justify-between gap-4"><span className="text-sky-400">Lordo</span><span className="font-mono-num">{formatEUR(d.gross)}</span></div>
-      <div className="flex justify-between gap-4"><span className="text-emerald-400">Netto post-tasse</span><span className="font-mono-num">{formatEUR(d.net)}</span></div>
-      <div className="flex justify-between gap-4"><span className="text-neutral-400">Versato</span><span className="font-mono-num">{formatEUR(d.contributed)}</span></div>
+      <div className="uppercase tracking-[0.18em] text-neutral-500 mb-1.5 font-bold">Year {label}</div>
+      <div className="flex justify-between gap-4"><span className="text-sky-400">Gross</span><span className="font-mono-num">{formatEUR(d.gross)}</span></div>
+      <div className="flex justify-between gap-4"><span className="text-emerald-400">Net post-tax</span><span className="font-mono-num">{formatEUR(d.net)}</span></div>
+      <div className="flex justify-between gap-4"><span className="text-neutral-400">Contributed</span><span className="font-mono-num">{formatEUR(d.contributed)}</span></div>
     </div>
   );
 };
@@ -143,22 +143,22 @@ export default function ProjectionCard() {
       <div className="flex items-start justify-between gap-4">
         <div className="min-w-0">
           <p className="text-[10px] uppercase tracking-[0.25em] font-bold text-neutral-500 mb-2 inline-flex items-center gap-2">
-            <Sparkles className="w-3 h-3" /> Calcolatore interesse composto
+            <Sparkles className="w-3 h-3" /> Compound Interest Calculator
           </p>
           <div className="flex items-baseline gap-3 flex-wrap">
             <div className="font-mono-num text-4xl sm:text-5xl tracking-tight text-emerald-400" data-testid="projection-net">
               {formatEUR(result.net)}
             </div>
             <div className="text-xs text-neutral-500">
-              netto · tra <span className="font-mono-num text-neutral-300">{years} anni</span> al <span className="font-mono-num text-neutral-300">{rate}%</span>/anno
+              net · over <span className="font-mono-num text-neutral-300">{years} years</span> at <span className="font-mono-num text-neutral-300">{rate}%</span>/year
             </div>
           </div>
           <div className="mt-1.5 text-xs text-neutral-500 flex flex-wrap gap-x-3 gap-y-1">
-            <span>Lordo <span className="font-mono-num text-neutral-300" data-testid="projection-gross">{formatEUR(result.gross)}</span></span>
-            <span>· Versato <span className="font-mono-num text-neutral-300">{formatEUR(result.contributed)}</span></span>
-            <span>· Tasse <span className="font-mono-num text-red-400" data-testid="projection-tax">{formatEUR(result.tax)}</span></span>
+            <span>Gross <span className="font-mono-num text-neutral-300" data-testid="projection-gross">{formatEUR(result.gross)}</span></span>
+            <span>· Contributed <span className="font-mono-num text-neutral-300">{formatEUR(result.contributed)}</span></span>
+            <span>· Tax <span className="font-mono-num text-red-400" data-testid="projection-tax">{formatEUR(result.tax)}</span></span>
             {(mgmtPct > 0 || perfPct > 0) && (
-              <span>· Commissioni <span className="font-mono-num text-amber-400" data-testid="projection-fees">{formatEUR(result.fees)}</span></span>
+              <span>· Fees <span className="font-mono-num text-amber-400" data-testid="projection-fees">{formatEUR(result.fees)}</span></span>
             )}
           </div>
         </div>
@@ -176,7 +176,7 @@ export default function ProjectionCard() {
       <div className="mt-6 grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
         <div className="space-y-4">
           <label className="block">
-            <span className="text-[10px] uppercase tracking-[0.2em] font-bold text-neutral-500">Capitale iniziale</span>
+            <span className="text-[10px] uppercase tracking-[0.2em] font-bold text-neutral-500">Initial Capital</span>
             <div className="mt-1.5 flex items-baseline gap-2">
               <span className="font-mono-num text-neutral-500">€</span>
               <input
@@ -188,7 +188,7 @@ export default function ProjectionCard() {
             </div>
           </label>
           <label className="block">
-            <span className="text-[10px] uppercase tracking-[0.2em] font-bold text-neutral-500">Versamento mensile</span>
+            <span className="text-[10px] uppercase tracking-[0.2em] font-bold text-neutral-500">Monthly Contribution</span>
             <div className="mt-1.5 flex items-baseline gap-2">
               <span className="font-mono-num text-neutral-500">€</span>
               <input
@@ -204,7 +204,7 @@ export default function ProjectionCard() {
         <div className="space-y-4">
           <div>
             <div className="flex items-baseline justify-between">
-              <span className="text-[10px] uppercase tracking-[0.2em] font-bold text-neutral-500">Rendimento annuo</span>
+              <span className="text-[10px] uppercase tracking-[0.2em] font-bold text-neutral-500">Annual Yield</span>
               <span className="font-mono-num text-sky-400 text-sm">{Number(rate).toFixed(1)}%</span>
             </div>
             <input
@@ -214,12 +214,12 @@ export default function ProjectionCard() {
               data-testid="projection-rate-input"
             />
             <div className="flex justify-between text-[10px] text-neutral-600 font-mono-num mt-1">
-              <span>1%</span><span>7% media</span><span>15%</span>
+              <span>1%</span><span>7% average</span><span>15%</span>
             </div>
           </div>
 
           <div>
-            <span className="text-[10px] uppercase tracking-[0.2em] font-bold text-neutral-500">Orizzonte temporale</span>
+            <span className="text-[10px] uppercase tracking-[0.2em] font-bold text-neutral-500">Time Horizon</span>
             <div className="mt-2 flex flex-wrap gap-2 items-center">
               {HORIZONS.map((h) => (
                 <button
@@ -231,7 +231,7 @@ export default function ProjectionCard() {
                   }`}
                   data-testid={`projection-years-${h}`}
                 >
-                  {h} anni
+                  {h} years
                 </button>
               ))}
               <div className="flex items-center gap-1.5 border border-white/10 rounded-full px-3 py-1">
@@ -241,7 +241,7 @@ export default function ProjectionCard() {
                   className="bg-transparent w-12 text-sm text-center font-mono-num outline-none"
                   data-testid="projection-years-custom"
                 />
-                <span className="text-xs text-neutral-500">anni</span>
+                <span className="text-xs text-neutral-500">years</span>
               </div>
             </div>
           </div>
@@ -257,8 +257,8 @@ export default function ProjectionCard() {
           data-testid="projection-advanced-toggle"
         >
           <span className="text-[10px] uppercase tracking-[0.25em] font-bold text-neutral-500 group-hover:text-neutral-300 transition-colors inline-flex items-center gap-2">
-            Opzioni avanzate
-            <span className="text-neutral-700 normal-case tracking-tight">· tasse, management &amp; performance fee</span>
+            Advanced Options
+            <span className="text-neutral-700 normal-case tracking-tight">· taxes, management &amp; performance fee</span>
           </span>
           <ChevronDown className={`w-4 h-4 text-neutral-500 group-hover:text-neutral-300 transition-all ${showAdvanced ? "rotate-180" : ""}`} />
         </button>
@@ -267,7 +267,7 @@ export default function ProjectionCard() {
           <div className="mt-4 grid grid-cols-1 sm:grid-cols-3 gap-4" data-testid="projection-advanced-panel">
             <label className="block border border-white/10 rounded-xl p-4">
               <div className="flex items-baseline justify-between mb-1.5">
-                <span className="text-[10px] uppercase tracking-[0.2em] font-bold text-neutral-500">Tasse plusvalenza</span>
+                <span className="text-[10px] uppercase tracking-[0.2em] font-bold text-neutral-500">Capital Gains Tax</span>
                 <span className="font-mono-num text-red-400 text-sm">{taxPct}%</span>
               </div>
               <input
@@ -277,13 +277,13 @@ export default function ProjectionCard() {
                 data-testid="projection-tax-input"
               />
               <p className="mt-2 text-[10px] text-neutral-600 leading-relaxed">
-                Italia: 26% standard · 12,5% su titoli di Stato
+                Italy: 26% standard · 12.5% on government bonds
               </p>
             </label>
 
             <label className="block border border-white/10 rounded-xl p-4">
               <div className="flex items-baseline justify-between mb-1.5">
-                <span className="text-[10px] uppercase tracking-[0.2em] font-bold text-neutral-500">Management fee /anno</span>
+                <span className="text-[10px] uppercase tracking-[0.2em] font-bold text-neutral-500">Management fee / year</span>
                 <span className="font-mono-num text-amber-400 text-sm">{Number(mgmtPct).toFixed(2)}%</span>
               </div>
               <input
@@ -293,7 +293,7 @@ export default function ProjectionCard() {
                 data-testid="projection-mgmt-input"
               />
               <p className="mt-2 text-[10px] text-neutral-600 leading-relaxed">
-                TER tipico ETF 0,07–0,40% · fondi attivi 1–2%
+                Typical ETF TER 0.07–0.40% · active funds 1–2%
               </p>
             </label>
 
@@ -309,7 +309,7 @@ export default function ProjectionCard() {
                 data-testid="projection-perf-input"
               />
               <p className="mt-2 text-[10px] text-neutral-600 leading-relaxed">
-                Sul guadagno annuo positivo (se previsto)
+                On positive annual gain (if expected)
               </p>
             </label>
           </div>
@@ -343,7 +343,7 @@ export default function ProjectionCard() {
       </div>
 
       <p className="mt-4 text-[11px] text-neutral-600 leading-relaxed">
-        Simulazione teorica con interesse composto mensile. Management fee detratta ogni mese sull&apos;AUM, performance fee a fine anno sul guadagno positivo, imposta sulla plusvalenza calcolata sull&apos;eventuale gain (versato escluso) al disinvestimento.
+        Theoretical simulation with monthly compound interest. Management fee deducted monthly on AUM, performance fee at the end of the year on positive gain, capital gains tax calculated on any gain (excluding contributions) upon withdrawal.
       </p>
     </div>
   );

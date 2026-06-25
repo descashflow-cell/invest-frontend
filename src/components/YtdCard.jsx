@@ -6,8 +6,8 @@ import { ChevronLeft, ChevronRight, Trophy, TrendingDown } from "lucide-react";
 import { getYtd } from "@/lib/api";
 import { formatEUR } from "@/lib/format";
 
-const MONTHS_SHORT = ["Gen", "Feb", "Mar", "Apr", "Mag", "Giu", "Lug", "Ago", "Set", "Ott", "Nov", "Dic"];
-const MONTHS_FULL = ["Gennaio", "Febbraio", "Marzo", "Aprile", "Maggio", "Giugno", "Luglio", "Agosto", "Settembre", "Ottobre", "Novembre", "Dicembre"];
+const MONTHS_SHORT = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+const MONTHS_FULL = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
 
 const fmtAxis = (v) => {
   if (Math.abs(v) >= 1000) return `${(v / 1000).toFixed(1)}k`;
@@ -20,9 +20,9 @@ const Tip = ({ active, payload, label }) => {
   return (
     <div className="bg-[#0A0A0A] border border-white/10 rounded-lg px-3 py-2.5 text-xs space-y-1 min-w-[180px]">
       <div className="uppercase tracking-[0.18em] text-neutral-500 mb-1.5 font-bold">{label}</div>
-      <div className="flex justify-between gap-4"><span className="text-emerald-400">Entrate</span><span className="font-mono-num">{formatEUR(d.income)}</span></div>
-      <div className="flex justify-between gap-4"><span className="text-red-400">Uscite</span><span className="font-mono-num">{formatEUR(d.expenses)}</span></div>
-      <div className="flex justify-between gap-4"><span className="text-sky-400">Investito</span><span className="font-mono-num">{formatEUR(d.invested)}</span></div>
+      <div className="flex justify-between gap-4"><span className="text-emerald-400">Incomes</span><span className="font-mono-num">{formatEUR(d.income)}</span></div>
+      <div className="flex justify-between gap-4"><span className="text-red-400">Expenses</span><span className="font-mono-num">{formatEUR(d.expenses)}</span></div>
+      <div className="flex justify-between gap-4"><span className="text-sky-400">Invested</span><span className="font-mono-num">{formatEUR(d.invested)}</span></div>
     </div>
   );
 };
@@ -78,11 +78,11 @@ export default function YtdCard() {
           </p>
           <div className="flex items-baseline gap-3">
             <h3 className="font-display text-3xl sm:text-4xl tracking-tighter font-light leading-none">
-              Anno <span className="font-mono-num text-neutral-400">{year}</span>
+              Year <span className="font-mono-num text-neutral-400">{year}</span>
             </h3>
           </div>
           <p className="text-xs text-neutral-500 mt-1.5">
-            {t.active_months} {t.active_months === 1 ? "mese attivo" : "mesi attivi"} · media mensile investita {formatEUR(t.active_months ? t.invested / t.active_months : 0)}
+            {t.active_months} {t.active_months === 1 ? "active month" : "active months"} · average monthly invested {formatEUR(t.active_months ? t.invested / t.active_months : 0)}
           </p>
         </div>
         <div className="flex items-center gap-2" data-testid="year-switcher">
@@ -91,7 +91,7 @@ export default function YtdCard() {
             onClick={() => setYear((y) => y - 1)}
             className="w-9 h-9 inline-flex items-center justify-center rounded-full border border-white/10 hover:bg-white/5 transition-colors active:scale-95"
             data-testid="year-prev"
-            aria-label="Anno precedente"
+            aria-label="Previous year"
           >
             <ChevronLeft className="w-4 h-4" />
           </button>
@@ -103,7 +103,7 @@ export default function YtdCard() {
             onClick={() => setYear((y) => y + 1)}
             className="w-9 h-9 inline-flex items-center justify-center rounded-full border border-white/10 hover:bg-white/5 transition-colors active:scale-95"
             data-testid="year-next"
-            aria-label="Anno successivo"
+            aria-label="Next year"
           >
             <ChevronRight className="w-4 h-4" />
           </button>
@@ -112,9 +112,9 @@ export default function YtdCard() {
 
       {/* KPIs */}
       <div className="mt-6 grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-4">
-        <Kpi label="Entrate" value={formatEUR(t.income)} accent="text-emerald-400" testid="ytd-kpi-income" />
-        <Kpi label="Uscite" value={formatEUR(t.expenses)} accent="text-red-400" testid="ytd-kpi-expenses" />
-        <Kpi label="Investito" value={formatEUR(t.invested)} accent="text-sky-400" testid="ytd-kpi-invested" />
+        <Kpi label="Income" value={formatEUR(t.income)} accent="text-emerald-400" testid="ytd-kpi-income" />
+        <Kpi label="Expenses" value={formatEUR(t.expenses)} accent="text-red-400" testid="ytd-kpi-expenses" />
+        <Kpi label="Invested" value={formatEUR(t.invested)} accent="text-sky-400" testid="ytd-kpi-invested" />
       </div>
 
       {/* Chart */}
@@ -133,10 +133,9 @@ export default function YtdCard() {
                 iconType="circle"
                 formatter={(v) => <span className="text-neutral-400">{v}</span>}
               />
-              <Bar dataKey="income" name="Entrate" fill="#10B981" radius={[4, 4, 0, 0]} maxBarSize={28} />
-              <Bar dataKey="expenses" name="Uscite" fill="#EF4444" radius={[4, 4, 0, 0]} maxBarSize={28} />
-              <Bar dataKey="invested" name="Investito" fill="#38BDF8" radius={[4, 4, 0, 0]} maxBarSize={28} />
-              <Bar dataKey="saved" name="Risparmiato" fill="#FFFFFF" radius={[4, 4, 0, 0]} maxBarSize={28} />
+              <Bar dataKey="income" name="Income" fill="#10B981" radius={[4, 4, 0, 0]} maxBarSize={28} />
+              <Bar dataKey="expenses" name="Expenses" fill="#EF4444" radius={[4, 4, 0, 0]} maxBarSize={28} />
+              <Bar dataKey="invested" name="Invested" fill="#38BDF8" radius={[4, 4, 0, 0]} maxBarSize={28} />
             </BarChart>
           </ResponsiveContainer>
         )}
@@ -149,7 +148,7 @@ export default function YtdCard() {
             <div className="flex items-center gap-3">
               <Trophy className="w-4 h-4 text-emerald-400 flex-shrink-0" />
               <div>
-                <p className="text-[10px] uppercase tracking-[0.2em] font-bold text-neutral-500">Mese top · saldo</p>
+                <p className="text-[10px] uppercase tracking-[0.2em] font-bold text-neutral-500">Best month · balance</p>
                 <p className="text-sm mt-0.5">{monthLabel(best?.month)}</p>
               </div>
             </div>
@@ -159,7 +158,7 @@ export default function YtdCard() {
             <div className="flex items-center gap-3">
               <TrendingDown className="w-4 h-4 text-red-400 flex-shrink-0" />
               <div>
-                <p className="text-[10px] uppercase tracking-[0.2em] font-bold text-neutral-500">Mese peggiore · saldo</p>
+                <p className="text-[10px] uppercase tracking-[0.2em] font-bold text-neutral-500">Worst month · balance</p>
                 <p className="text-sm mt-0.5">{monthLabel(worst?.month)}</p>
               </div>
             </div>

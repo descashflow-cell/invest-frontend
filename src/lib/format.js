@@ -23,9 +23,14 @@ const MONTHS_IT = [
   "Luglio", "Agosto", "Settembre", "Ottobre", "Novembre", "Dicembre",
 ];
 
+const MONTHS_EN = [
+  "January", "February", "March", "April", "May", "June",
+  "July", "August", "September", "October", "November", "December",
+];
+
 export const formatMonth = (key) => {
   const d = parseMonth(key);
-  return `${MONTHS_IT[d.getMonth()]} ${d.getFullYear()}`;
+  return `${MONTHS_EN[d.getMonth()]} ${d.getFullYear()}`;
 };
 
 export const shiftMonth = (key, delta) => {
@@ -33,3 +38,8 @@ export const shiftMonth = (key, delta) => {
   d.setMonth(d.getMonth() + delta);
   return monthKey(d);
 };
+
+export const capitalize = (s) => {
+  if (!s) return "";
+  return s.charAt(0).toUpperCase() + s.slice(1);
+}

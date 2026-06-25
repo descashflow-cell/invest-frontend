@@ -19,7 +19,7 @@ export default function ExtraExpensesCard({ month, items, onChanged }) {
   const save = async () => {
     const num = parseFloat(amount);
     if (!name.trim() || isNaN(num) || num <= 0 || !category.trim()) {
-      toast.error("Compila tutti i campi");
+      toast.error("Fill in all fields");
       return;
     }
     setSaving(true);
@@ -30,11 +30,11 @@ export default function ExtraExpensesCard({ month, items, onChanged }) {
         category: category.trim(),
         month,
       });
-      toast.success("Spesa aggiunta");
+      toast.success("Expense added");
       reset();
       onChanged?.();
     } catch {
-      toast.error("Errore nell'aggiunta");
+      toast.error("Error adding expense");
     } finally {
       setSaving(false);
     }
@@ -45,13 +45,13 @@ export default function ExtraExpensesCard({ month, items, onChanged }) {
     setDeletingIds((s) => new Set(s).add(id));
     try {
       await deleteExtraExpense(id);
-      toast.success("Spesa eliminata");
+      toast.success("Expense deleted");
       onChanged?.();
     } catch (e) {
       if (e?.response?.status === 404) {
         onChanged?.();
       } else {
-        toast.error("Errore nell'eliminazione");
+        toast.error("Error deleting expense");
         setDeletingIds((s) => {
           const next = new Set(s);
           next.delete(id);
@@ -69,12 +69,12 @@ export default function ExtraExpensesCard({ month, items, onChanged }) {
       <div className="flex items-start justify-between">
         <div>
           <p className="text-[10px] uppercase tracking-[0.25em] font-bold text-neutral-500 mb-2">
-            Spese Extra · del mese
+            Extra Expenses · of the Month
           </p>
           <div className="font-mono-num text-3xl sm:text-4xl tracking-tight" data-testid="extra-total">
             {formatEUR(total)}
           </div>
-          <p className="text-xs text-neutral-500 mt-1">{items.length} {items.length === 1 ? "transazione" : "transazioni"}</p>
+          <p className="text-xs text-neutral-500 mt-1">{items.length} {items.length === 1 ? "transaction" : "transactions"}</p>
         </div>
         {!adding && (
           <button
@@ -83,7 +83,7 @@ export default function ExtraExpensesCard({ month, items, onChanged }) {
             className="bg-white text-black font-medium px-5 py-2.5 rounded-full hover:bg-neutral-200 transition-colors active:scale-95 inline-flex items-center gap-1.5 text-sm"
             data-testid="add-extra-button"
           >
-            <Plus className="w-4 h-4" /> Aggiungi spesa
+            <Plus className="w-4 h-4" /> Add Expense
           </button>
         )}
       </div>
@@ -93,22 +93,6 @@ export default function ExtraExpensesCard({ month, items, onChanged }) {
           <div className="grid grid-cols-1 sm:grid-cols-12 gap-3">
             <input
               autoFocus
-              type="text"
-              placeholder="Descrizione"
-              value={name}
-              onChange={(e) => setName(e.target.value)}
-              className="sm:col-span-5 bg-transparent border border-white/10 rounded-lg px-3 py-2 text-sm focus:border-white outline-none placeholder:text-white/20"
-              data-testid="extra-name-input"
-            />
-            <input
-              type="text"
-              placeholder="Categoria (es. cibo)"
-              value={category}
-              onChange={(e) => setCategory(e.target.value)}
-              className="sm:col-span-4 bg-transparent border border-white/10 rounded-lg px-3 py-2 text-sm focus:border-white outline-none placeholder:text-white/20"
-              data-testid="extra-category-input"
-            />
-            <input
               type="number"
               step="0.01"
               min="0"
@@ -119,6 +103,22 @@ export default function ExtraExpensesCard({ month, items, onChanged }) {
               className="sm:col-span-3 bg-transparent border border-white/10 rounded-lg px-3 py-2 text-sm font-mono-num focus:border-white outline-none placeholder:text-white/20"
               data-testid="extra-amount-input"
             />
+            <input
+              type="text"
+              placeholder="Description"
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+              className="sm:col-span-5 bg-transparent border border-white/10 rounded-lg px-3 py-2 text-sm focus:border-white outline-none placeholder:text-white/20"
+              data-testid="extra-name-input"
+            />
+            <input
+              type="text"
+              placeholder="Category (e.g. food)"
+              value={category}
+              onChange={(e) => setCategory(e.target.value)}
+              className="sm:col-span-4 bg-transparent border border-white/10 rounded-lg px-3 py-2 text-sm focus:border-white outline-none placeholder:text-white/20"
+              data-testid="extra-category-input"
+            />
           </div>
           <div className="mt-3 flex gap-2 justify-end">
             <button
@@ -127,7 +127,7 @@ export default function ExtraExpensesCard({ month, items, onChanged }) {
               className="text-sm text-neutral-400 hover:text-white px-3 py-1.5 inline-flex items-center gap-1"
               data-testid="extra-cancel-button"
             >
-              <X className="w-3.5 h-3.5" /> Annulla
+              <X className="w-3.5 h-3.5" /> Cancel
             </button>
             <button
               type="button"
@@ -136,7 +136,7 @@ export default function ExtraExpensesCard({ month, items, onChanged }) {
               className="bg-white text-black font-medium text-sm px-4 py-1.5 rounded-full hover:bg-neutral-200 transition-colors active:scale-95 disabled:opacity-50"
               data-testid="extra-save-button"
             >
-              Salva
+              Save
             </button>
           </div>
         </div>
@@ -145,7 +145,7 @@ export default function ExtraExpensesCard({ month, items, onChanged }) {
       <div className="mt-5" data-testid="extra-list">
         {items.length === 0 && !adding && (
           <div className="py-10 text-center text-sm text-neutral-600 border border-dashed border-white/10 rounded-xl">
-            Nessuna spesa extra questo mese.
+            No extra expenses this month.
           </div>
         )}
         {items.length > 0 && (
