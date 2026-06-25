@@ -28,7 +28,7 @@ export const authMe = () => api.get("/auth/me").then((r) => r.data);
 
 export const getSummary = (month) => api.get(`/summary/${month}`).then((r) => r.data);
 export const setSalary = (month, amount) => api.put(`/salary/${month}`, { amount }).then((r) => r.data);
-export const addFixedExpense = (data) => api.post(`/fixed-expenses`, data).then((r) => r.data);
+export const addFixedExpense = (month, data) => api.post(`/fixed-expenses/${month}`, data).then((r) => r.data);
 export const deleteFixedExpense = (id) => api.delete(`/fixed-expenses/${id}`).then((r) => r.data);
 export const addExtraExpense = (data) => api.post(`/extra-expenses`, data).then((r) => r.data);
 export const deleteExtraExpense = (id) => api.delete(`/extra-expenses/${id}`).then((r) => r.data);
