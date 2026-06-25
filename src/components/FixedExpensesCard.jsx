@@ -4,7 +4,7 @@ import { addFixedExpense, deleteFixedExpense } from "@/lib/api";
 import { formatEUR } from "@/lib/format";
 import { toast } from "sonner";
 
-export default function FixedExpensesCard({ items, onChanged }) {
+export default function FixedExpensesCard({ month, items, onChanged }) {
   const [adding, setAdding] = useState(false);
   const [name, setName] = useState("");
   const [amount, setAmount] = useState("");
@@ -23,7 +23,7 @@ export default function FixedExpensesCard({ items, onChanged }) {
     }
     setSaving(true);
     try {
-      await addFixedExpense({ name: name.trim(), amount: num });
+      await addFixedExpense(month, { name: name.trim(), amount: num });
       toast.success("Spesa fissa aggiunta");
       reset();
       onChanged?.();
