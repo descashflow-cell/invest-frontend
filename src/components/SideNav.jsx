@@ -3,9 +3,9 @@ import { useState } from "react";
 import { useAuth } from "@/contexts/AuthContext";
 
 const ITEMS = [
-  { id: "cashflow", label: "Cashflow", icon: Wallet, hint: "Stipendio · spese" },
-  { id: "investments", label: "Investimenti", icon: LineChart, hint: "Portafoglio · ETF" },
-  { id: "projection", label: "Proiezione", icon: Sparkles, hint: "Crescita futura" },
+  { id: "cashflow", label: "Cashflow", icon: Wallet, hint: "Salary · expenses" },
+  { id: "investments", label: "Investments", icon: LineChart, hint: "Portfolio · ETFs" },
+  { id: "projection", label: "Projection", icon: Sparkles, hint: "Future growth" },
 ];
 
 export default function SideNav({ active, onChange, collapsed, onToggleCollapsed }) {

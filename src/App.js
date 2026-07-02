@@ -27,6 +27,7 @@ function App() {
           <Routes>
             <Route path="/login" element={<PublicOnly><Login /></PublicOnly>} />
             <Route path="/" element={<Protected><Dashboard /></Protected>} />
+            <Route path="*" element={<Navigate to="/" replace />} />
           </Routes>
         </BrowserRouter>
       </AuthProvider>

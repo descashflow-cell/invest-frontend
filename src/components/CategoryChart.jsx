@@ -24,17 +24,17 @@ export default function CategoryChart({ byCategory, total }) {
     >
       <div>
         <p className="text-[10px] uppercase tracking-[0.25em] font-bold text-neutral-500 mb-2">
-          Analisi · per categoria
+          Analysis · by Category
         </p>
         <div className="font-mono-num text-3xl sm:text-4xl tracking-tight">
           {formatEUR(total)}
         </div>
-        <p className="text-xs text-neutral-500 mt-1">Distribuzione spese extra</p>
+        <p className="text-xs text-neutral-500 mt-1">Extra Expenses Distribution</p>
       </div>
 
       {!hasData ? (
         <div className="mt-6 flex-1 flex items-center justify-center text-sm text-neutral-600 border border-dashed border-white/10 rounded-xl">
-          Aggiungi spese per vedere l'analisi
+          Add expenses to see the analysis
         </div>
       ) : (
         <div className="mt-4 flex-1 flex flex-col sm:flex-row items-center gap-4">

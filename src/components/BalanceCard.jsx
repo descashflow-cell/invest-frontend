@@ -19,7 +19,7 @@ export default function BalanceCard({ data, loading }) {
 
       <div className="flex items-center justify-between">
         <p className="text-[10px] uppercase tracking-[0.25em] font-bold text-neutral-500">
-          Saldo del mese
+          Monthly balance
         </p>
         <div className={`inline-flex items-center gap-1.5 text-xs ${positive ? "text-emerald-400" : "text-red-400"}`} data-testid="balance-trend">
           {positive ? <TrendingUp className="w-3.5 h-3.5" /> : <TrendingDown className="w-3.5 h-3.5" />}
@@ -35,7 +35,7 @@ export default function BalanceCard({ data, loading }) {
           {loading ? "—" : formatEUR(balance)}
         </div>
         <p className="mt-3 text-sm text-neutral-500">
-          {positive ? "Disponibile dopo le uscite" : "In rosso questo mese"}
+          {positive ? "Remaining Balance" : "Over Budget This Month"}
         </p>
       </div>
 
@@ -47,8 +47,8 @@ export default function BalanceCard({ data, loading }) {
           />
         </div>
         <div className="mt-3 flex items-center justify-between text-xs text-neutral-500 font-mono-num">
-          <span>Entrate {formatEUR(salary)}</span>
-          <span>Uscite {formatEUR((data?.fixed_total ?? 0) + (data?.extra_total ?? 0))}</span>
+          <span>Income {formatEUR(salary)}</span>
+          <span>Expenses {formatEUR((data?.fixed_total ?? 0) + (data?.extra_total ?? 0))}</span>
         </div>
       </div>
     </div>

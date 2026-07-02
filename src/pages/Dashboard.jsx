@@ -16,9 +16,9 @@ import ProjectionCard from "@/components/ProjectionCard";
 import SideNav from "@/components/SideNav";
 
 const TITLES = {
-  cashflow: { kicker: "Panoramica · cashflow", title: "Il mio saldo", italic: "del mese." },
-  investments: { kicker: "Patrimonio", title: "Investimenti", italic: "& portafoglio." },
-  projection: { kicker: "Pianificazione", title: "Proiezione", italic: "futura." },
+  cashflow: { kicker: "Overview · cashflow", title: "My balance", italic: "for the month." },
+  investments: { kicker: "Assets", title: "Investments", italic: "& portfolio." },
+  projection: { kicker: "Planning", title: "Future", italic: "projection." },
 };
 
 export default function Dashboard() {
@@ -102,7 +102,7 @@ export default function Dashboard() {
                   <SalaryCard month={month} amount={data?.salary ?? 0} onUpdated={onChanged} />
                 </motion.div>
                 <motion.div variants={item} className="md:col-span-12 lg:col-span-7">
-                  <FixedExpensesCard items={data?.fixed_expenses ?? []} onChanged={onChanged} />
+                  <FixedExpensesCard month={month} items={data?.fixed_expenses ?? []} onChanged={onChanged} />
                 </motion.div>
                 <motion.div variants={item} className="md:col-span-12 lg:col-span-5">
                   <CategoryChart byCategory={data?.by_category ?? []} total={data?.extra_total ?? 0} />
@@ -130,7 +130,7 @@ export default function Dashboard() {
                 <motion.div variants={item} className="md:col-span-12 mt-2 sm:mt-4">
                   <div className="flex items-end justify-between gap-4 pb-3 border-b border-white/5">
                     <h2 className="font-display text-3xl tracking-tighter font-light">
-                      Anno fino ad <span className="italic text-neutral-400">oggi</span>.
+                      Year <span className="italic text-neutral-400">to date</span>.
                     </h2>
                   </div>
                 </motion.div>
