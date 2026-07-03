@@ -47,7 +47,7 @@ export default function SideNav({ active, onChange, collapsed, onToggleCollapsed
     <>
       {/* Mobile top bar */}
       <div className="lg:hidden flex items-center justify-between px-4 py-3 border-b border-white/5 bg-[#0A0A0A] sticky top-0 z-30">
-        <span className="font-display text-xl tracking-tight">Cashflow.</span>
+        <span className="font-display text-xl tracking-tight">PlanWise</span>
         <button
           type="button"
           onClick={() => setOpenMobile((v) => !v)}
@@ -74,8 +74,7 @@ export default function SideNav({ active, onChange, collapsed, onToggleCollapsed
         <div className={`mb-8 flex ${collapsed ? "justify-center" : "items-start justify-between"}`}>
           {!collapsed && (
             <div>
-              <p className="text-[10px] uppercase tracking-[0.25em] font-bold text-neutral-500 mb-1">Personal</p>
-              <h1 className="font-display text-2xl tracking-tighter font-light">Cashflow.</h1>
+              <h1 className="font-display text-2xl tracking-tighter font-light">PlanWise</h1>
             </div>
           )}
           <button
