@@ -10,14 +10,17 @@ import FixedExpensesCard from "@/components/FixedExpensesCard";
 import ExtraExpensesCard from "@/components/ExtraExpensesCard";
 import CategoryChart from "@/components/CategoryChart";
 import InvestmentsCard from "@/components/InvestmentsCard";
+import MonthlyPortfolioCard from "@/components/MonthlyPortfolioCard";
 import PortfolioCard from "@/components/PortfolioCard";
 import YtdCard from "@/components/YtdCard";
 import ProjectionCard from "@/components/ProjectionCard";
 import SideNav from "@/components/SideNav";
+import InvestmentsList from "@/components/InvestmentsList";
 
 const TITLES = {
   cashflow: { kicker: "Overview · cashflow", title: "My balance", italic: "for the month." },
-  investments: { kicker: "Assets", title: "Investments", italic: "& portfolio." },
+  ytd: { kicker: "YTD", title: "Year", italic: "to date." },
+  portfolio: { kicker: "Assets", title: "Portfolio", italic: "" },
   projection: { kicker: "Planning", title: "Future", italic: "projection." },
 };
 
@@ -29,6 +32,7 @@ export default function Dashboard() {
   const [month, setMonth] = useState(() => monthKey(new Date()));
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [monthlyPortfolioRefresh, setMonthlyPortfolioRefresh] = useState(0);
   const [portfolioRefresh, setPortfolioRefresh] = useState(0);
   const [ytdKey, setYtdKey] = useState(0);
 
@@ -44,8 +48,11 @@ export default function Dashboard() {
   const onChanged = () => { refresh(month); setYtdKey((n) => n + 1); };
   const onInvestmentChanged = () => {
     refresh(month);
-    setPortfolioRefresh((n) => n + 1);
+    setMonthlyPortfolioRefresh((n) => n + 1);
     setYtdKey((n) => n + 1);
+  };
+  const onInvestmentListChanged = () => {
+    setPortfolioRefresh((n) => n + 1);
   };
 
   const toggleNav = () => {
@@ -81,7 +88,7 @@ export default function Dashboard() {
               {t.title} <span className="italic text-neutral-400">{t.italic}</span>
             </h1>
           </div>
-          {active !== "projection" && <MonthSwitcher month={month} onChange={setMonth} />}
+          {active === "cashflow" && <MonthSwitcher month={month} onChange={setMonth} />}
         </header>
 
         <AnimatePresence mode="wait">
@@ -99,7 +106,7 @@ export default function Dashboard() {
                   <BalanceCard data={data} loading={loading} />
                 </motion.div>
                 <motion.div variants={item} className="md:col-span-12 lg:col-span-7">
-                  <SalaryCard month={month} amount={data?.salary ?? 0} onUpdated={onChanged} />
+                  <SalaryCard month={month} items={data?.incomes ?? []} onUpdated={onChanged} />
                 </motion.div>
                 <motion.div variants={item} className="md:col-span-12 lg:col-span-7">
                   <FixedExpensesCard month={month} items={data?.fixed_expenses ?? []} onChanged={onChanged} />
@@ -110,11 +117,6 @@ export default function Dashboard() {
                 <motion.div variants={item} className="md:col-span-12">
                   <ExtraExpensesCard month={month} items={data?.extra_expenses ?? []} onChanged={onChanged} />
                 </motion.div>
-              </>
-            )}
-
-            {active === "investments" && (
-              <>
                 <motion.div variants={item} className="md:col-span-12 lg:col-span-7">
                   <InvestmentsCard
                     month={month}
@@ -125,17 +127,24 @@ export default function Dashboard() {
                   />
                 </motion.div>
                 <motion.div variants={item} className="md:col-span-12 lg:col-span-5">
-                  <PortfolioCard refreshKey={portfolioRefresh} />
+                  <MonthlyPortfolioCard month={month} refreshKey={monthlyPortfolioRefresh} />
                 </motion.div>
-                <motion.div variants={item} className="md:col-span-12 mt-2 sm:mt-4">
-                  <div className="flex items-end justify-between gap-4 pb-3 border-b border-white/5">
-                    <h2 className="font-display text-3xl tracking-tighter font-light">
-                      Year <span className="italic text-neutral-400">to date</span>.
-                    </h2>
-                  </div>
-                </motion.div>
+              </>
+            )}
+
+            {active === "ytd" && (
                 <motion.div variants={item} className="md:col-span-12">
                   <YtdCard key={ytdKey} />
+                </motion.div>
+            )}
+
+            {active === "portfolio" && (
+              <>
+                <motion.div variants={item} className="md:col-span-12 lg:col-span-7">
+                  <PortfolioCard refreshKey={portfolioRefresh}/>
+                </motion.div>
+                <motion.div variants={item} className="md:col-span-12">
+                  <InvestmentsList onChanged={onInvestmentListChanged} />
                 </motion.div>
               </>
             )}

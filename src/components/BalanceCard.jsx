@@ -3,7 +3,7 @@ import { TrendingUp, TrendingDown } from "lucide-react";
 
 export default function BalanceCard({ data, loading }) {
   const balance = data?.balance ?? 0;
-  const salary = data?.salary ?? 0;
+  const salary = data?.incomes?.reduce((s, i) => s + i.amount, 0) ?? 0;
   const positive = balance >= 0;
 
   const pct = salary > 0 ? Math.max(0, Math.min(100, (balance / salary) * 100)) : 0;
@@ -49,6 +49,7 @@ export default function BalanceCard({ data, loading }) {
         <div className="mt-3 flex items-center justify-between text-xs text-neutral-500 font-mono-num">
           <span>Income {formatEUR(salary)}</span>
           <span>Expenses {formatEUR((data?.fixed_total ?? 0) + (data?.extra_total ?? 0))}</span>
+          <span>Investments {formatEUR(data?.investments_month_total ?? 0)}</span>
         </div>
       </div>
     </div>
