@@ -4,7 +4,8 @@ import { useAuth } from "@/contexts/AuthContext";
 
 const ITEMS = [
   { id: "cashflow", label: "Cashflow", icon: Wallet, hint: "Salary · expenses" },
-  { id: "investments", label: "Investments", icon: LineChart, hint: "Portfolio · ETFs" },
+  { id: "portfolio", label: "Portfolio", icon: LineChart, hint: "Portfolio · ETFs" },
+  { id: "ytd", label: "Year to Date", icon: LineChart, hint: "Year to date" },
   { id: "projection", label: "Projection", icon: Sparkles, hint: "Future growth" },
 ];
 

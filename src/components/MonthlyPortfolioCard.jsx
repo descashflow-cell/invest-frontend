@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip } from "recharts";
-import { getPortfolio } from "@/lib/api";
+import { getMonthlyPortfolio } from "@/lib/api";
 import { formatEUR } from "@/lib/format";
 
 const COLORS = ["#38BDF8", "#A78BFA", "#F472B6", "#FBBF24", "#34D399", "#F87171", "#94A3B8", "#FB923C"];
@@ -16,46 +16,22 @@ const CustomTooltip = ({ active, payload }) => {
   );
 };
 
-export default function PortfolioCard({ refreshKey }) {
-  const [data, setData] = useState({ total: 0, items: []/*, starting_investments: []*/ });
+export default function MonthlyPortfolioCard({ month, refreshKey }) {
+  const [data, setData] = useState({ total: 0, items: [] });
   const [loading, setLoading] = useState(true);
-  // const [deletingIds, setDeletingIds] = useState(() => new Set());
-  // const [refresh, setRefresh] = useState(0);
 
   useEffect(() => {
     let cancelled = false;
     setLoading(true);
-    getPortfolio()
+    getMonthlyPortfolio(month)
       .then((res) => { if (!cancelled) setData(res); })
       .catch(() => {})
       .finally(() => { if (!cancelled) setLoading(false); });
     return () => { cancelled = true; };
-  }, [refreshKey]);
-
-  // const remove = async (id) => {
-  //   if (deletingIds.has(id)) return;
-  //   setDeletingIds((s) => new Set(s).add(id));
-  //   try {
-  //     await deleteInvestment(id);
-  //     toast.success("Investment removed");
-  //     setRefresh((r) => r + 1);
-  //   } catch (e) {
-  //     if (e?.response?.status === 404) {
-  //       setRefresh((r) => r + 1);
-  //     } else {
-  //       toast.error("Error deleting investment");
-  //       setDeletingIds((s) => {
-  //         const next = new Set(s);
-  //         next.delete(id);
-  //         return next;
-  //       });
-  //     }
-  //   }
-  // };
+  }, [month, refreshKey]);
 
   const items = data.items || [];
   const total = data.total || 0;
-  // const startingInvestments = data.starting_investments || [];
   const hasData = items.length > 0 && total > 0;
 
   return (
@@ -65,7 +41,7 @@ export default function PortfolioCard({ refreshKey }) {
     >
       <div>
         <p className="text-[10px] uppercase tracking-[0.25em] font-bold text-neutral-500 mb-2">
-          Portfolio · Cumulative
+          Monthly · Portfolio
         </p>
         <div className="font-mono-num text-3xl sm:text-4xl tracking-tight text-sky-400" data-testid="portfolio-total">
           {formatEUR(total)}

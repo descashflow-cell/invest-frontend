@@ -71,13 +71,13 @@ export default function InvestmentsCard({ month, items, suggested, totalMonth, o
             <div className="font-mono-num text-3xl sm:text-4xl tracking-tight text-sky-400" data-testid="investments-total">
               {formatEUR(totalMonth)}
             </div>
-            <div className="text-xs text-neutral-500">
+            {/* <div className="text-xs text-neutral-500">
               of <span className="font-mono-num text-neutral-300" data-testid="suggested-investable">{formatEUR(suggested)}</span> suggested
-            </div>
+            </div> */}
           </div>
-          <p className="text-[11px] text-neutral-500 mt-1.5 inline-flex items-center gap-1.5">
+          {/* <p className="text-[11px] text-neutral-500 mt-1.5 inline-flex items-center gap-1.5">
             <TrendingUp className="w-3 h-3" /> 50% of the balance as investable quota
-          </p>
+          </p> */}
         </div>
         {!adding && (
           <button
@@ -92,7 +92,7 @@ export default function InvestmentsCard({ month, items, suggested, totalMonth, o
       </div>
 
       {/* progress bar */}
-      <div className="mt-4">
+      {/* <div className="mt-4">
         <div className="h-[2px] w-full bg-white/5 overflow-hidden rounded-full">
           <div
             className={`h-full transition-all duration-700 ${overBudget ? "bg-amber-400" : "bg-sky-400"}`}
@@ -103,7 +103,7 @@ export default function InvestmentsCard({ month, items, suggested, totalMonth, o
           <span>Used Quota</span>
           <span className="font-mono-num normal-case tracking-tight">{usedPct.toFixed(0)}%{overBudget ? " · over budget" : ""}</span>
         </div>
-      </div>
+      </div> */}
 
       {adding && (
         <div className="mt-5 p-4 border border-white/10 rounded-xl bg-white/[0.02]" data-testid="add-investment-form">
@@ -126,7 +126,7 @@ export default function InvestmentsCard({ month, items, suggested, totalMonth, o
               data-testid="investment-type-select"
             >
               <option value="" className="text-black">Select type</option>
-              {["Recurring", "Extra", "Initial"].map((type) => (
+              {["Monthly", "Extra"].map((type) => (
                 <option key={type} value={type.toLowerCase()} className="text-black">{type}</option>
               ))}
             </select>
@@ -177,7 +177,7 @@ export default function InvestmentsCard({ month, items, suggested, totalMonth, o
                   <span className="text-sm truncate">{it.name}</span>
                 </div>
                 <div className="flex items-center gap-3 min-w-0 flex-1 justify-center">
-                  <span className="text-sm truncate">{capitalize(it.type) || 'Recurring'}</span>
+                  <span className="text-sm truncate">{capitalize(it.type) || 'Monthly'}</span>
                 </div>
                 <div className="flex items-center gap-3 flex-shrink-0">
                   <span className="font-mono-num text-sm text-neutral-300">{formatEUR(it.amount)}</span>
