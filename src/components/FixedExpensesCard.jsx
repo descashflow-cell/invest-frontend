@@ -1,6 +1,11 @@
 import { useState } from "react";
-import { Plus, Trash2, X, Copy } from "lucide-react";
-import { addFixedExpense, deleteFixedExpense, copyFixedExpense } from "@/lib/api";
+import { Plus, Trash2, X, Copy, Pencil, Check } from "lucide-react";
+import {
+  addFixedExpense,
+  deleteFixedExpense,
+  copyFixedExpense,
+  updateFixedExpense,
+} from "@/lib/api";
 import { formatEUR } from "@/lib/format";
 import { toast } from "sonner";
 
@@ -11,6 +16,9 @@ export default function FixedExpensesCard({ month, items, onChanged }) {
   const [saving, setSaving] = useState(false);
   const [copying, setCopying] = useState(false);
   const [deletingIds, setDeletingIds] = useState(() => new Set());
+  const [editingIds, setEditingIds] = useState(() => new Set());
+  const [editName, setEditName] = useState("");
+  const [editAmount, setEditAmount] = useState("");
 
   const total = items.reduce((s, i) => s + i.amount, 0);
 
@@ -46,10 +54,12 @@ export default function FixedExpensesCard({ month, items, onChanged }) {
       toast.success("Fixed expenses copied from last month");
       onChanged?.();
     } catch (e) {
-      if(e.response?.data?.detail) {
+      if (e.response?.data?.detail) {
         switch (e.response.data.detail) {
           case "FIXED_EXPENSES_ALREADY_EXIST":
-            toast.error("You have already inserted some fixed expenses for this month");
+            toast.error(
+              "You have already inserted some fixed expenses for this month",
+            );
             break;
           case "NO_FIXED_EXPENSES_TO_COPY":
             toast.error("No fixed expenses to copy from last month");
@@ -63,7 +73,30 @@ export default function FixedExpensesCard({ month, items, onChanged }) {
     } finally {
       setCopying(false);
     }
-  }
+  };
+
+  const edit = async (id) => {
+    const num = parseFloat(editAmount);
+    if (isNaN(num) || num < 0 || !editName.trim()) {
+      toast.error("Fill in a valid amount and name");
+      return;
+    }
+    setSaving(true);
+    try {
+      await updateFixedExpense(id, { amount: num, name: editName.trim() });
+      toast.success("Fixed expense updated");
+      setEditingIds((s) => {
+        const next = new Set(s);
+        next.delete(id);
+        return next;
+      });
+      onChanged?.();
+    } catch (e) {
+      toast.error("Error updating fixed expense");
+    } finally {
+      setSaving(false);
+    }
+  };
 
   const remove = async (id) => {
     if (deletingIds.has(id)) return;
@@ -199,22 +232,93 @@ export default function FixedExpensesCard({ month, items, onChanged }) {
             >
               <div className="flex items-center gap-3 min-w-0">
                 <div className="w-1.5 h-1.5 rounded-full bg-red-400/80 flex-shrink-0" />
-                <span className="text-sm truncate">{it.name}</span>
+                {!editingIds.has(it.id) && (
+                  <span className="text-sm truncate">{it.name}</span>
+                )}
+                {editingIds.has(it.id) && (
+                  <input
+                    type="text"
+                    placeholder="E.g. Rent, Bills..."
+                    value={editName}
+                    onChange={(e) => setEditName(e.target.value)}
+                    className="sm:col-span-3 bg-transparent border border-white/10 rounded-lg px-3 py-2 text-sm focus:border-white outline-none placeholder:text-white/20"
+                    data-testid="fixed-name-input"
+                  />
+                )}
               </div>
               <div className="flex items-center gap-3 flex-shrink-0">
-                <span className="font-mono-num text-sm text-neutral-300">
-                  {formatEUR(it.amount)}
-                </span>
-                <button
-                  type="button"
-                  onClick={() => remove(it.id)}
-                  disabled={deletingIds.has(it.id)}
-                  className="opacity-0 group-hover:opacity-100 text-neutral-500 hover:text-red-400 transition-all disabled:opacity-40 disabled:cursor-not-allowed"
-                  data-testid={`fixed-delete-${it.id}`}
-                  aria-label="Elimina"
-                >
-                  <Trash2 className="w-3.5 h-3.5" />
-                </button>
+                {!editingIds.has(it.id) && (
+                  <>
+                    <span className="font-mono-num text-sm text-neutral-300">
+                      {formatEUR(it.amount)}
+                    </span>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setEditingIds(new Set(editingIds).add(it.id));
+                        setEditName(it.name);
+                        setEditAmount(it.amount);
+                      }}
+                      className="opacity-0 group-hover:opacity-100 text-neutral-500 hover:text-emerald-400 transition-all disabled:opacity-40 disabled:cursor-not-allowed"
+                      data-testid={`fixed-edit-${it.id}`}
+                      aria-label="Edit"
+                    >
+                      <Pencil className="w-3.5 h-3.5" />
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => remove(it.id)}
+                      disabled={deletingIds.has(it.id)}
+                      className="opacity-0 group-hover:opacity-100 text-neutral-500 hover:text-red-400 transition-all disabled:opacity-40 disabled:cursor-not-allowed"
+                      data-testid={`fixed-delete-${it.id}`}
+                      aria-label="Elimina"
+                    >
+                      <Trash2 className="w-3.5 h-3.5" />
+                    </button>
+                  </>
+                )}
+                {editingIds.has(it.id) && (
+                  <>
+                    <input
+                      autoFocus
+                      type="number"
+                      step="0.01"
+                      min="0"
+                      placeholder="€ 0,00"
+                      value={editAmount}
+                      onChange={(e) => setEditAmount(e.target.value)}
+                      onKeyDown={(e) => e.key === "Enter" && edit(it.id)}
+                      className="sm:col-span-2 bg-transparent border border-white/10 rounded-lg px-3 py-2 text-sm font-mono-num focus:border-white outline-none placeholder:text-white/20"
+                      data-testid="fixed-amount-input"
+                    />
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setEditingIds((s) => {
+                          const next = new Set(s);
+                          next.delete(it.id);
+                          return next;
+                        });
+                        setEditName("");
+                        setEditAmount("");
+                      }}
+                      className="text-neutral-500 hover:text-red-400 transition-all"
+                      data-testid={`fixed-cancel-${it.id}`}
+                      aria-label="Cancel"
+                    >
+                      <X className="w-3.5 h-3.5" />
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => edit(it.id)}
+                      className="text-neutral-500 hover:text-emerald-400 transition-all"
+                      data-testid={`fixed-edit-${it.id}`}
+                      aria-label="Edit"
+                    >
+                      <Check className="w-3.5 h-3.5" />
+                    </button>
+                  </>
+                )}
               </div>
             </li>
           ))}
