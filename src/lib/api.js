@@ -41,3 +41,4 @@ export const getPortfolio = () => api.get(`/portfolio`).then((r) => r.data);
 export const getMonthlyPortfolio = (month) => api.get(`/portfolio/${month}`).then((r) => r.data);
 export const getYtd = (year) => api.get(`/ytd/${year}`).then((r) => r.data);
 export const getInvestmentsList = () => api.get(`/investments-list`).then((r) => r.data);
+export const copyFixedExpense = (month) => api.post(`/fixed-expenses/copy/${month}`).then((r) => r.data);

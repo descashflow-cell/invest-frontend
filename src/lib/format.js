@@ -13,6 +13,12 @@ export const monthKey = (date) => {
   return `${y}-${m}`;
 };
 
+export const previousMonthKey = (key) => {
+  const d = parseMonth(key);
+  d.setMonth(d.getMonth() - 1);
+  return monthKey(d);
+}
+
 export const parseMonth = (key) => {
   const [y, m] = key.split("-").map(Number);
   return new Date(y, m - 1, 1);
