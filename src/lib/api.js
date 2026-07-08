@@ -27,6 +27,7 @@ export const authLogin = (data) => api.post("/auth/login", data).then((r) => r.d
 export const authMe = () => api.get("/auth/me").then((r) => r.data);
 
 export const getSummary = (month) => api.get(`/summary/${month}`).then((r) => r.data);
+export const getCategories = () => api.get(`/available-categories`).then((r) => r.data);
 export const setSalary = (month, amount) => api.put(`/salary/${month}`, { amount }).then((r) => r.data);
 export const addIncome = (month, data) => api.post(`/incomes/${month}`, data).then((r) => r.data);
 export const updateIncome = (id, data) => api.put(`/incomes/${id}`, data).then((r) => r.data);

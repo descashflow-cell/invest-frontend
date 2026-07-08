@@ -3,8 +3,9 @@ import { Plus, Trash2, X, Pencil, Check } from "lucide-react";
 import { addExtraExpense, deleteExtraExpense, updateExtraExpense } from "@/lib/api";
 import { formatEUR } from "@/lib/format";
 import { toast } from "sonner";
+import Autocomplete from "./Autocomplete";
 
-export default function ExtraExpensesCard({ month, items, onChanged }) {
+export default function ExtraExpensesCard({ month, items, onChanged, categories }) {
   const [adding, setAdding] = useState(false);
   const [name, setName] = useState("");
   const [amount, setAmount] = useState("");
@@ -151,14 +152,20 @@ export default function ExtraExpensesCard({ month, items, onChanged }) {
               className="sm:col-span-5 bg-transparent border border-white/10 rounded-lg px-3 py-2 text-sm focus:border-white outline-none placeholder:text-white/20"
               data-testid="extra-name-input"
             />
-            <input
+            <Autocomplete
+              items={categories.extra_categories}
+              value={category}
+              onChange={setCategory}
+              placeholder="Category (e.g. food)"
+            />
+            {/* <input
               type="text"
               placeholder="Category (e.g. food)"
               value={category}
               onChange={(e) => setCategory(e.target.value)}
               className="sm:col-span-4 bg-transparent border border-white/10 rounded-lg px-3 py-2 text-sm focus:border-white outline-none placeholder:text-white/20"
               data-testid="extra-category-input"
-            />
+            /> */}
           </div>
           <div className="mt-3 flex gap-2 justify-end">
             <button

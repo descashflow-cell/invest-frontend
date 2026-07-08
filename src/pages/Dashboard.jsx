@@ -1,7 +1,7 @@
 import { useEffect, useState, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { toast } from "sonner";
-import { getSummary } from "@/lib/api";
+import { getSummary, getCategories } from "@/lib/api";
 import { monthKey } from "@/lib/format";
 import FullscreenLoader from "@/components/FullscreenLoader";
 import MonthSwitcher from "@/components/MonthSwitcher";
@@ -40,6 +40,7 @@ export default function Dashboard() {
   });
   const [month, setMonth] = useState(() => monthKey(new Date()));
   const [data, setData] = useState(null);
+  const [categories, setCategories] = useState({ extra_categories: [], fixed_names: [], investments_names: [] });
   const [loading, setLoading] = useState(true);
   const [monthlyPortfolioRefresh, setMonthlyPortfolioRefresh] = useState(0);
   const [portfolioRefresh, setPortfolioRefresh] = useState(0);
@@ -49,6 +50,7 @@ export default function Dashboard() {
     setLoading(true);
     try {
       setData(await getSummary(m));
+      setCategories(await getCategories());
     } catch {
       toast.error("Errore nel caricamento dei dati");
     } finally {
@@ -186,6 +188,7 @@ export default function Dashboard() {
                         month={month}
                         items={data?.extra_expenses ?? []}
                         onChanged={onChanged}
+                        categories={categories}
                       />
                     </motion.div>
                     <motion.div
