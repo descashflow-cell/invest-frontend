@@ -1,21 +1,50 @@
 import { useState } from "react";
-import { Plus, Trash2, X, TrendingUp } from "lucide-react";
-import { addInvestment, deleteInvestment } from "@/lib/api";
+import { Plus, Trash2, X, Pencil, Check } from "lucide-react";
+import { addInvestment, deleteInvestment, updateInvestment } from "@/lib/api";
 import { formatEUR, capitalize } from "@/lib/format";
 import { toast } from "sonner";
+import { INV_COLORS } from "@/lib/utils";
 
-export default function InvestmentsCard({ month, items, suggested, totalMonth, onChanged }) {
+export default function InvestmentsCard({
+  month,
+  items,
+  suggested,
+  totalMonth,
+  onChanged,
+}) {
   const [adding, setAdding] = useState(false);
   const [name, setName] = useState("");
   const [amount, setAmount] = useState("");
   const [type, setType] = useState("");
   const [saving, setSaving] = useState(false);
   const [deletingIds, setDeletingIds] = useState(() => new Set());
+  const [editingIds, setEditingIds] = useState(() => new Set());
+  const [editName, setEditName] = useState("");
+  const [editAmount, setEditAmount] = useState("");
+  const [editType, setEditType] = useState("");
 
-  const reset = () => { setName(""); setAmount(""); setType(""); setAdding(false); };
+  const reset = () => {
+    setName("");
+    setAmount("");
+    setType("");
+    setAdding(false);
+  };
 
-  const usedPct = suggested > 0 ? Math.min(100, (totalMonth / suggested) * 100) : 0;
+  const usedPct =
+    suggested > 0 ? Math.min(100, (totalMonth / suggested) * 100) : 0;
   const overBudget = totalMonth > suggested && suggested > 0;
+
+  const investments = items || [];
+  const totalByType = new Map();
+  investments.forEach((elem) => {
+    totalByType.set(elem.name, (totalByType.get(elem.name) ?? 0) + elem.amount);
+  });
+  const orderedTotalByType = new Map(
+    [...totalByType.entries()].sort(([, a], [, b]) => b - a),
+  );
+  const typeIndex = new Map(
+    [...orderedTotalByType.keys()].map((key, i) => [key, i]),
+  );
 
   const save = async () => {
     const num = parseFloat(amount);
@@ -31,6 +60,34 @@ export default function InvestmentsCard({ month, items, suggested, totalMonth, o
       onChanged?.();
     } catch {
       toast.error("Error adding investment");
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  const edit = async (id) => {
+    const num = parseFloat(editAmount);
+    if (isNaN(num) || num < 0 || !editName.trim() || !editType) {
+      toast.error("Fill in a valid amount, name, and type");
+      return;
+    }
+    setSaving(true);
+    try {
+      await updateInvestment(id, {
+        amount: num,
+        name: editName.trim(),
+        type: editType,
+        month,
+      });
+      toast.success("Investment updated");
+      setEditingIds((s) => {
+        const next = new Set(s);
+        next.delete(id);
+        return next;
+      });
+      onChanged?.();
+    } catch (e) {
+      toast.error("Error updating investment");
     } finally {
       setSaving(false);
     }
@@ -68,7 +125,10 @@ export default function InvestmentsCard({ month, items, suggested, totalMonth, o
             Monthly Investments
           </p>
           <div className="flex items-baseline gap-3 flex-wrap">
-            <div className="font-mono-num text-3xl sm:text-4xl tracking-tight text-sky-400" data-testid="investments-total">
+            <div
+              className="font-mono-num text-3xl sm:text-4xl tracking-tight text-sky-400"
+              data-testid="investments-total"
+            >
               {formatEUR(totalMonth)}
             </div>
             {/* <div className="text-xs text-neutral-500">
@@ -91,22 +151,11 @@ export default function InvestmentsCard({ month, items, suggested, totalMonth, o
         )}
       </div>
 
-      {/* progress bar */}
-      {/* <div className="mt-4">
-        <div className="h-[2px] w-full bg-white/5 overflow-hidden rounded-full">
-          <div
-            className={`h-full transition-all duration-700 ${overBudget ? "bg-amber-400" : "bg-sky-400"}`}
-            style={{ width: `${usedPct}%` }}
-          />
-        </div>
-        <div className="mt-2 flex items-center justify-between text-[10px] uppercase tracking-[0.2em] text-neutral-500 font-bold">
-          <span>Used Quota</span>
-          <span className="font-mono-num normal-case tracking-tight">{usedPct.toFixed(0)}%{overBudget ? " · over budget" : ""}</span>
-        </div>
-      </div> */}
-
       {adding && (
-        <div className="mt-5 p-4 border border-white/10 rounded-xl bg-white/[0.02]" data-testid="add-investment-form">
+        <div
+          className="mt-5 p-4 border border-white/10 rounded-xl bg-white/[0.02]"
+          data-testid="add-investment-form"
+        >
           <div className="grid grid-cols-1 sm:grid-cols-12 gap-3">
             <input
               type="number"
@@ -125,9 +174,17 @@ export default function InvestmentsCard({ month, items, suggested, totalMonth, o
               className="sm:col-span-4 bg-transparent border border-white/10 rounded-lg px-3 py-2 text-sm focus:border-white outline-none placeholder:text-white/20"
               data-testid="investment-type-select"
             >
-              <option value="" className="text-black">Select type</option>
+              <option value="" className="text-black">
+                Select type
+              </option>
               {["Monthly", "Extra"].map((type) => (
-                <option key={type} value={type.toLowerCase()} className="text-black">{type}</option>
+                <option
+                  key={type}
+                  value={type.toLowerCase()}
+                  className="text-black"
+                >
+                  {type}
+                </option>
               ))}
             </select>
             <input
@@ -171,26 +228,139 @@ export default function InvestmentsCard({ month, items, suggested, totalMonth, o
         {items.length > 0 && (
           <ul className="divide-y divide-white/5">
             {items.map((it) => (
-              <li key={it.id} className="py-3 flex items-center justify-between group gap-3" data-testid={`investment-item-${it.id}`}>
-                <div className="flex items-center gap-3 min-w-0">
-                  <div className="w-1.5 h-1.5 rounded-full bg-sky-400 flex-shrink-0" />
-                  <span className="text-sm truncate">{it.name}</span>
+              <li
+                key={it.id}
+                className="py-3 grid grid-cols-3 group gap-3"
+                data-testid={`investment-item-${it.id}`}
+              >
+                <div className="flex items-center gap-3">
+                  <div
+                    className={`w-1.5 h-1.5 rounded-full flex-shrink-0`}
+                    style={{
+                      backgroundColor:
+                        INV_COLORS[
+                          (typeIndex.get(it.name) ?? 0) % INV_COLORS.length
+                        ],
+                    }}
+                  />
+                  {!editingIds.has(it.id) && (
+                    <span className="text-sm truncate">{it.name}</span>
+                  )}
+                  {editingIds.has(it.id) && (
+                    <input
+                      type="text"
+                      placeholder="Sector or ETF (e.g., VWCE, Tech, S&P 500)"
+                      value={editName}
+                      onChange={(e) => setEditName(e.target.value)}
+                      className="sm:col-span-3 bg-transparent border border-white/10 rounded-lg px-3 py-2 text-sm focus:border-white outline-none placeholder:text-white/20"
+                      data-testid="investment-name-input"
+                    />
+                  )}
                 </div>
-                <div className="flex items-center gap-3 min-w-0 flex-1 justify-center">
-                  <span className="text-sm truncate">{capitalize(it.type) || 'Monthly'}</span>
+                <div className="flex items-center justify-center">
+                  {!editingIds.has(it.id) && (
+                    <span className="text-sm truncate">
+                      {capitalize(it.type) || "Monthly"}
+                    </span>
+                  )}
+                  {editingIds.has(it.id) && (
+                    <select
+                      value={editType}
+                      onChange={(e) => setEditType(e.target.value)}
+                      className="sm:col-span-4 bg-transparent border border-white/10 rounded-lg px-3 py-2 text-sm focus:border-white outline-none placeholder:text-white/20"
+                      data-testid="investment-type-select"
+                    >
+                      <option value="" className="text-black">
+                        Select type
+                      </option>
+                      {["Monthly", "Extra"].map((type) => (
+                        <option
+                          key={type}
+                          value={type.toLowerCase()}
+                          className="text-black"
+                        >
+                          {type}
+                        </option>
+                      ))}
+                    </select>
+                  )}
                 </div>
-                <div className="flex items-center gap-3 flex-shrink-0">
-                  <span className="font-mono-num text-sm text-neutral-300">{formatEUR(it.amount)}</span>
-                  <button
-                    type="button"
-                    onClick={() => remove(it.id)}
-                    disabled={deletingIds.has(it.id)}
-                    className="opacity-0 group-hover:opacity-100 text-neutral-500 hover:text-red-400 transition-all disabled:opacity-40 disabled:cursor-not-allowed"
-                    data-testid={`investment-delete-${it.id}`}
-                    aria-label="Delete"
-                  >
-                    <Trash2 className="w-3.5 h-3.5" />
-                  </button>
+                <div className="flex items-center justify-end gap-3">
+                  {!editingIds.has(it.id) && (
+                    <>
+                      <span className="font-mono-num text-sm text-neutral-300">
+                        {formatEUR(it.amount)}
+                      </span>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setEditingIds(new Set(editingIds).add(it.id));
+                          setEditName(it.name);
+                          setEditAmount(it.amount);
+                          setEditType(it.type);
+                        }}
+                        className="opacity-0 group-hover:opacity-100 text-neutral-500 hover:text-emerald-400 transition-all disabled:opacity-40 disabled:cursor-not-allowed"
+                        data-testid={`investment-edit-${it.id}`}
+                        aria-label="Edit"
+                      >
+                        <Pencil className="w-3.5 h-3.5" />
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => remove(it.id)}
+                        disabled={deletingIds.has(it.id)}
+                        className="opacity-0 group-hover:opacity-100 text-neutral-500 hover:text-red-400 transition-all disabled:opacity-40 disabled:cursor-not-allowed"
+                        data-testid={`investment-delete-${it.id}`}
+                        aria-label="Delete"
+                      >
+                        <Trash2 className="w-3.5 h-3.5" />
+                      </button>
+                    </>
+                  )}
+                  {editingIds.has(it.id) && (
+                    <>
+                      <input
+                        autoFocus
+                        type="number"
+                        step="0.01"
+                        min="0"
+                        placeholder="€ 0,00"
+                        value={editAmount}
+                        onChange={(e) => setEditAmount(e.target.value)}
+                        onKeyDown={(e) => e.key === "Enter" && edit(it.id)}
+                        className="sm:col-span-2 bg-transparent border border-white/10 rounded-lg px-3 py-2 text-sm font-mono-num focus:border-white outline-none placeholder:text-white/20"
+                        data-testid="investment-amount-input"
+                      />
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setEditingIds((s) => {
+                            const next = new Set(s);
+                            next.delete(it.id);
+                            return next;
+                          });
+                          setEditName("");
+                          setEditAmount("");
+                          setEditType("");
+                        }}
+                        className="text-neutral-500 hover:text-red-400 transition-all"
+                        data-testid={`investment-cancel-${it.id}`}
+                        aria-label="Cancel"
+                      >
+                        <X className="w-3.5 h-3.5" />
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => edit(it.id)}
+                        disabled={saving}
+                        className="text-neutral-500 hover:text-emerald-400 transition-all"
+                        data-testid={`investment-edit-${it.id}`}
+                        aria-label="Edit"
+                      >
+                        <Check className="w-3.5 h-3.5" />
+                      </button>
+                    </>
+                  )}
                 </div>
               </li>
             ))}
