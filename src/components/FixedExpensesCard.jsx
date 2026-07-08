@@ -5,6 +5,7 @@ import {
   deleteFixedExpense,
   copyFixedExpense,
   updateFixedExpense,
+  deleteAllFixedExpense
 } from "@/lib/api";
 import { formatEUR } from "@/lib/format";
 import { toast } from "sonner";
@@ -120,6 +121,21 @@ export default function FixedExpensesCard({ month, items, onChanged }) {
     }
   };
 
+  const removeAll = async () => {
+    try {
+      await deleteAllFixedExpense(month);
+      toast.success("All fixed expenses deleted");
+      onChanged?.();
+    } catch (e) {
+      if (e?.response?.status === 404) {
+        onChanged?.();
+      } else {
+        toast.error("Error deleting all fixed expenses");
+        // no need to update deletingIds when removing all
+      }
+    }
+  };
+
   return (
     <div
       data-testid="fixed-expenses-card"
@@ -143,14 +159,26 @@ export default function FixedExpensesCard({ month, items, onChanged }) {
         </div>
         {!adding && !copying && (
           <>
-            <button
-              type="button"
-              onClick={copy}
-              className="border border-white/10 bg-transparent text-white px-4 py-2 rounded-full hover:bg-white/5 transition-colors active:scale-95 inline-flex items-center gap-1.5 text-sm"
-              data-testid="copy-fixed-button"
-            >
-              <Copy className="w-3.5 h-3.5" /> Copy from last month
-            </button>
+            {items.length === 0 && (
+              <button
+                type="button"
+                onClick={copy}
+                className="border border-white/10 bg-transparent text-white px-4 py-2 rounded-full hover:bg-white/5 transition-colors active:scale-95 inline-flex items-center gap-1.5 text-sm"
+                data-testid="copy-fixed-button"
+              >
+                <Copy className="w-3.5 h-3.5" /> Copy from last month
+              </button>
+            )}
+            {items.length > 0 && (
+              <button
+                type="button"
+                onClick={removeAll}
+                className="border border-red-400/10 bg-transparent text-red-400 px-4 py-2 rounded-full hover:bg-red-400/5 transition-colors active:scale-95 inline-flex items-center gap-1.5 text-sm"
+                data-testid="delete-all-fixed-button"
+              >
+                <Trash2 className="w-3.5 h-3.5" /> Delete all
+              </button>
+            )}
             <button
               type="button"
               onClick={() => setAdding(true)}

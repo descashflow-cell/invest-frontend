@@ -34,6 +34,7 @@ export const deleteIncome = (id) => api.delete(`/incomes/${id}`).then((r) => r.d
 export const addFixedExpense = (month, data) => api.post(`/fixed-expenses/${month}`, data).then((r) => r.data);
 export const deleteFixedExpense = (id) => api.delete(`/fixed-expenses/${id}`).then((r) => r.data);
 export const updateFixedExpense = (id, data) => api.put(`/fixed-expenses/${id}`, data).then((r) => r.data);
+export const deleteAllFixedExpense = (month) => api.delete(`/fixed-expenses/all/${month}`).then((r) => r.data);
 export const addExtraExpense = (data) => api.post(`/extra-expenses`, data).then((r) => r.data);
 export const deleteExtraExpense = (id) => api.delete(`/extra-expenses/${id}`).then((r) => r.data);
 export const addInvestment = (data) => api.post(`/investments`, data).then((r) => r.data);
