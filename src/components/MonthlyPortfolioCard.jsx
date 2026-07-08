@@ -2,8 +2,8 @@ import { useEffect, useState } from "react";
 import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip } from "recharts";
 import { getMonthlyPortfolio } from "@/lib/api";
 import { formatEUR } from "@/lib/format";
+import { INV_COLORS } from "@/lib/utils";
 
-const COLORS = ["#38BDF8", "#A78BFA", "#F472B6", "#FBBF24", "#34D399", "#F87171", "#94A3B8", "#FB923C"];
 
 const CustomTooltip = ({ active, payload }) => {
   if (!active || !payload || !payload.length) return null;
@@ -70,7 +70,7 @@ export default function MonthlyPortfolioCard({ month, refreshKey }) {
                     strokeWidth={2}
                   >
                     {items.map((_, i) => (
-                      <Cell key={i} fill={COLORS[i % COLORS.length]} />
+                      <Cell key={i} fill={INV_COLORS[i % INV_COLORS.length]} />
                     ))}
                   </Pie>
                   <Tooltip content={<CustomTooltip />} />
@@ -83,7 +83,7 @@ export default function MonthlyPortfolioCard({ month, refreshKey }) {
                 return (
                   <li key={c.name} className="flex items-center justify-between gap-2 text-xs">
                     <div className="flex items-center gap-2 min-w-0">
-                      <span className="w-2 h-2 rounded-full flex-shrink-0" style={{ background: COLORS[i % COLORS.length] }} />
+                      <span className="w-2 h-2 rounded-full flex-shrink-0" style={{ background: INV_COLORS[i % INV_COLORS.length] }} />
                       <span className="truncate">{c.name}</span>
                     </div>
                     <span className="font-mono-num text-neutral-400 flex-shrink-0">{pct.toFixed(0)}%</span>

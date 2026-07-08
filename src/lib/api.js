@@ -27,17 +27,23 @@ export const authLogin = (data) => api.post("/auth/login", data).then((r) => r.d
 export const authMe = () => api.get("/auth/me").then((r) => r.data);
 
 export const getSummary = (month) => api.get(`/summary/${month}`).then((r) => r.data);
+export const getCategories = () => api.get(`/available-categories`).then((r) => r.data);
 export const setSalary = (month, amount) => api.put(`/salary/${month}`, { amount }).then((r) => r.data);
 export const addIncome = (month, data) => api.post(`/incomes/${month}`, data).then((r) => r.data);
 export const updateIncome = (id, data) => api.put(`/incomes/${id}`, data).then((r) => r.data);
 export const deleteIncome = (id) => api.delete(`/incomes/${id}`).then((r) => r.data);
 export const addFixedExpense = (month, data) => api.post(`/fixed-expenses/${month}`, data).then((r) => r.data);
 export const deleteFixedExpense = (id) => api.delete(`/fixed-expenses/${id}`).then((r) => r.data);
+export const updateFixedExpense = (id, data) => api.put(`/fixed-expenses/${id}`, data).then((r) => r.data);
+export const deleteAllFixedExpense = (month) => api.delete(`/fixed-expenses/all/${month}`).then((r) => r.data);
 export const addExtraExpense = (data) => api.post(`/extra-expenses`, data).then((r) => r.data);
+export const updateExtraExpense = (id, data) => api.put(`/extra-expenses/${id}`, data).then((r) => r.data);
 export const deleteExtraExpense = (id) => api.delete(`/extra-expenses/${id}`).then((r) => r.data);
 export const addInvestment = (data) => api.post(`/investments`, data).then((r) => r.data);
+export const updateInvestment = (id, data) => api.put(`/investments/${id}`, data).then((r) => r.data);
 export const deleteInvestment = (id) => api.delete(`/investments/${id}`).then((r) => r.data);
 export const getPortfolio = () => api.get(`/portfolio`).then((r) => r.data);
 export const getMonthlyPortfolio = (month) => api.get(`/portfolio/${month}`).then((r) => r.data);
 export const getYtd = (year) => api.get(`/ytd/${year}`).then((r) => r.data);
 export const getInvestmentsList = () => api.get(`/investments-list`).then((r) => r.data);
+export const copyFixedExpense = (month) => api.post(`/fixed-expenses/copy/${month}`).then((r) => r.data);
