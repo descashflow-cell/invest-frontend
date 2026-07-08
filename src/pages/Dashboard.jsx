@@ -3,6 +3,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { toast } from "sonner";
 import { getSummary } from "@/lib/api";
 import { monthKey } from "@/lib/format";
+import FullscreenLoader from "@/components/FullscreenLoader";
 import MonthSwitcher from "@/components/MonthSwitcher";
 import BalanceCard from "@/components/BalanceCard";
 import SalaryCard from "@/components/SalaryCard";
@@ -115,9 +116,7 @@ export default function Dashboard() {
         className={`${navCollapsed ? "lg:ml-[72px]" : "lg:ml-[240px]"} transition-[margin] duration-300 ease-out px-4 sm:px-8 lg:px-12 py-8 sm:py-12 max-w-[1400px]`}
       >
         {loading && (
-          <div className="flex items-center justify-center h-screen">
-            <div className="h-16 w-16 border-4 border-white border-t-transparent rounded-full animate-spin" />
-          </div>
+          <FullscreenLoader />
         )}
         {!loading && (
           <>
