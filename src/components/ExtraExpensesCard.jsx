@@ -1,11 +1,20 @@
 import { useState } from "react";
 import { Plus, Trash2, X, Pencil, Check } from "lucide-react";
-import { addExtraExpense, deleteExtraExpense, updateExtraExpense } from "@/lib/api";
+import {
+  addExtraExpense,
+  deleteExtraExpense,
+  updateExtraExpense,
+} from "@/lib/api";
 import { formatEUR } from "@/lib/format";
 import { toast } from "sonner";
 import Autocomplete from "./Autocomplete";
 
-export default function ExtraExpensesCard({ month, items, onChanged, categories }) {
+export default function ExtraExpensesCard({
+  month,
+  items,
+  onChanged,
+  categories,
+}) {
   const [adding, setAdding] = useState(false);
   const [name, setName] = useState("");
   const [amount, setAmount] = useState("");
@@ -58,7 +67,12 @@ export default function ExtraExpensesCard({ month, items, onChanged, categories 
     }
     setSaving(true);
     try {
-      await updateExtraExpense(id, { amount: num, name: editName.trim(), category: editCategory.trim(), month });
+      await updateExtraExpense(id, {
+        amount: num,
+        name: editName.trim(),
+        category: editCategory.trim(),
+        month,
+      });
       toast.success("Expense updated");
       setEditingIds((s) => {
         const next = new Set(s);
@@ -102,7 +116,7 @@ export default function ExtraExpensesCard({ month, items, onChanged, categories 
       <div className="flex items-start justify-between">
         <div>
           <p className="text-[10px] uppercase tracking-[0.25em] font-bold text-neutral-500 mb-2">
-            Extra Expenses · of the Month
+            Monthly Extra Expenses
           </p>
           <div
             className="font-mono-num text-3xl sm:text-4xl tracking-tight"
@@ -121,7 +135,7 @@ export default function ExtraExpensesCard({ month, items, onChanged, categories 
             className="bg-white text-black font-medium px-5 py-2.5 rounded-full hover:bg-neutral-200 transition-colors active:scale-95 inline-flex items-center gap-1.5 text-sm"
             data-testid="add-extra-button"
           >
-            <Plus className="w-4 h-4" /> Add Expense
+            <Plus className="w-4 h-4" /> Add
           </button>
         )}
       </div>
@@ -154,18 +168,10 @@ export default function ExtraExpensesCard({ month, items, onChanged, categories 
             />
             <Autocomplete
               items={categories.extra_categories}
-              value={category}
+              valueFrom={category}
               onChange={setCategory}
               placeholder="Category (e.g. food)"
             />
-            {/* <input
-              type="text"
-              placeholder="Category (e.g. food)"
-              value={category}
-              onChange={(e) => setCategory(e.target.value)}
-              className="sm:col-span-4 bg-transparent border border-white/10 rounded-lg px-3 py-2 text-sm focus:border-white outline-none placeholder:text-white/20"
-              data-testid="extra-category-input"
-            /> */}
           </div>
           <div className="mt-3 flex gap-2 justify-end">
             <button
@@ -203,71 +209,28 @@ export default function ExtraExpensesCard({ month, items, onChanged, categories 
                 className="py-3.5 flex items-center justify-between group gap-4"
                 data-testid={`extra-item-${it.id}`}
               >
-                <div className="flex items-center gap-3 min-w-0 flex-1">
-                  <div className="w-1.5 h-1.5 rounded-full bg-white/40 flex-shrink-0" />
-                  {!editingIds.has(it.id) && (
-                    <span className="text-sm truncate">{it.name}</span>
-                  )}
-                  {editingIds.has(it.id) && (
-                    <input
-                      type="text"
-                      placeholder="Description"
-                      value={editName}
-                      onChange={(e) => setEditName(e.target.value)}
-                      className="sm:col-span-3 bg-transparent border border-white/10 rounded-lg px-3 py-2 text-sm focus:border-white outline-none placeholder:text-white/20"
-                      data-testid="extra-name-input"
-                    />
-                  )}
-                  {!editingIds.has(it.id) && (
-                    <span className="text-[10px] uppercase tracking-[0.18em] text-neutral-500 px-2 py-0.5 border border-white/10 rounded-full flex-shrink-0">{it.category}</span>
-                  )}
-                  {editingIds.has(it.id) && (
-                    <input
-                      type="text"
-                      placeholder="Category (e.g. food)"
-                      value={editCategory}
-                      onChange={(e) => setEditCategory(e.target.value)}
-                      className="sm:col-span-3 bg-transparent border border-white/10 rounded-lg px-3 py-2 text-sm focus:border-white outline-none placeholder:text-white/20"
-                      data-testid="extra-category-input"
-                    />
-                  )}
-                </div>
-                <div className="flex items-center gap-4 flex-shrink-0">
-                  {!editingIds.has(it.id) && (
-                    <>
-                      <span className="font-mono-num text-sm text-neutral-300">
-                        {formatEUR(it.amount)}
-                      </span>
-                      <button
-                        type="button"
-                        onClick={() => {
-                          setEditingIds(new Set(editingIds).add(it.id));
-                          setEditName(it.name);
-                          setEditAmount(it.amount);
-                          setEditCategory(it.category);
-                        }}
-                        className="opacity-0 group-hover:opacity-100 text-neutral-500 hover:text-emerald-400 transition-all disabled:opacity-40 disabled:cursor-not-allowed"
-                        data-testid={`extra-edit-${it.id}`}
-                        aria-label="Edit"
-                      >
-                        <Pencil className="w-3.5 h-3.5" />
-                      </button>
-                      <button
-                        type="button"
-                        onClick={() => remove(it.id)}
-                        disabled={deletingIds.has(it.id)}
-                        className="opacity-0 group-hover:opacity-100 text-neutral-500 hover:text-red-400 transition-all disabled:opacity-40 disabled:cursor-not-allowed"
-                        data-testid={`extra-delete-${it.id}`}
-                        aria-label="Elimina"
-                      >
-                        <Trash2 className="w-3.5 h-3.5" />
-                      </button>
-                    </>
-                  )}
-                  {editingIds.has(it.id) && (
-                    <>
+                {editingIds.has(it.id) && (
+                  <div
+                    className="mt-5 p-4 border border-white/10 rounded-xl bg-white/[0.02] w-full sm:flex sm:gap-3"
+                    data-testid="add-extra-form"
+                  >
+                    <div className="grid grid-cols-1 sm:grid-cols-12 gap-3">
                       <input
                         autoFocus
+                        type="text"
+                        placeholder="Description"
+                        value={editName}
+                        onChange={(e) => setEditName(e.target.value)}
+                        className="sm:col-span-5 bg-transparent border border-white/10 rounded-lg px-3 py-2 text-sm focus:border-white outline-none placeholder:text-white/20"
+                        data-testid="extra-name-input"
+                      />
+                      <Autocomplete
+                        items={categories.extra_categories}
+                        valueFrom={editCategory}
+                        onChange={setEditCategory}
+                        placeholder="Category (e.g. food)"
+                      />
+                      <input
                         type="number"
                         step="0.01"
                         min="0"
@@ -275,9 +238,11 @@ export default function ExtraExpensesCard({ month, items, onChanged, categories 
                         value={editAmount}
                         onChange={(e) => setEditAmount(e.target.value)}
                         onKeyDown={(e) => e.key === "Enter" && edit(it.id)}
-                        className="sm:col-span-2 bg-transparent border border-white/10 rounded-lg px-3 py-2 text-sm font-mono-num focus:border-white outline-none placeholder:text-white/20"
+                        className="sm:col-span-3 bg-transparent border border-white/10 rounded-lg px-3 py-2 text-sm font-mono-num focus:border-white outline-none placeholder:text-white/20"
                         data-testid="extra-amount-input"
                       />
+                    </div>
+                    <div className="flex gap-2 justify-end mt-2 sm:mt-0">
                       <button
                         type="button"
                         onClick={() => {
@@ -290,25 +255,63 @@ export default function ExtraExpensesCard({ month, items, onChanged, categories 
                           setEditAmount("");
                           setEditCategory("");
                         }}
-                        className="text-neutral-500 hover:text-red-400 transition-all"
-                        data-testid={`extra-cancel-${it.id}`}
-                        aria-label="Cancel"
+                        className="text-sm text-neutral-400 hover:text-white px-3 py-1.5 inline-flex items-center gap-1"
+                        data-testid="extra-cancel-button"
                       >
-                        <X className="w-3.5 h-3.5" />
+                        <X className="w-3.5 h-3.5" /> Cancel
                       </button>
                       <button
                         type="button"
                         onClick={() => edit(it.id)}
                         disabled={saving}
-                        className="text-neutral-500 hover:text-emerald-400 transition-all"
+                        className="bg-white text-black font-medium text-sm px-4 py-1.5 rounded-full hover:bg-neutral-200 transition-colors active:scale-95 disabled:opacity-50 inline-flex items-center gap-1"
+                        data-testid="extra-save-button"
+                      >
+                        <Check className="w-3.5 h-3.5" /> Update
+                      </button>
+                    </div>
+                  </div>
+                )}
+                {!editingIds.has(it.id) && (
+                  <>
+                    <div className="flex items-center gap-3 min-w-0 flex-1">
+                      <div className="w-1.5 h-1.5 rounded-full bg-white/40 flex-shrink-0" />
+                      <span className="text-sm">{it.name}</span>
+                      <span className="text-[10px] uppercase tracking-[0.18em] text-neutral-500 px-2 py-0.5 border border-white/10 rounded-full flex-shrink-0">
+                        {it.category}
+                      </span>
+                    </div>
+                    <div className="flex items-center gap-4 flex-shrink-0">
+                      <span className="font-mono-num text-sm text-neutral-300">
+                        {formatEUR(it.amount)}
+                      </span>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setEditingIds(new Set(editingIds).add(it.id));
+                          setEditName(it.name);
+                          setEditAmount(it.amount);
+                          setEditCategory(it.category);
+                        }}
+                        className="sm:opacity-0 sm:group-hover:opacity-100 text-emerald-400 sm:text-neutral-500 sm:hover:text-emerald-400 transition-all disabled:opacity-40 disabled:cursor-not-allowed"
                         data-testid={`extra-edit-${it.id}`}
                         aria-label="Edit"
                       >
-                        <Check className="w-3.5 h-3.5" />
+                        <Pencil className="w-3.5 h-3.5" />
                       </button>
-                    </>
-                  )}
-                </div>
+                      <button
+                        type="button"
+                        onClick={() => remove(it.id)}
+                        disabled={deletingIds.has(it.id)}
+                        className="sm:opacity-0 sm:group-hover:opacity-100 text-red-400 sm:text-neutral-500 sm:hover:text-red-400 transition-all disabled:opacity-40 disabled:cursor-not-allowed"
+                        data-testid={`extra-delete-${it.id}`}
+                        aria-label="Elimina"
+                      >
+                        <Trash2 className="w-3.5 h-3.5" />
+                      </button>
+                    </div>
+                  </>
+                )}
               </li>
             ))}
           </ul>

@@ -60,7 +60,7 @@ export default function SideNav({ active, onChange, collapsed, onToggleCollapsed
       </div>
 
       {openMobile && (
-        <div className="lg:hidden border-b border-white/5 bg-[#0A0A0A] p-4 space-y-2" data-testid="nav-mobile">
+        <div className="lg:hidden border-b border-white/5 bg-[#0A0A0A] p-4 space-y-2 sticky top-14 z-30" data-testid="nav-mobile">
           {ITEMS.map((it) => <Link key={it.id} it={it} />)}
         </div>
       )}

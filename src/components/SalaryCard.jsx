@@ -97,7 +97,7 @@ export default function SalaryCard({ month, items, onUpdated }) {
             Monthly Incomes
           </p>
           <div
-            className="font-mono-num text-5xl sm:text-6xl tracking-tight leading-none text-emerald-400"
+            className="font-mono-num text-3xl sm:text-6xl tracking-tight leading-none text-emerald-400"
             data-testid="incomes-total"
           >
             {formatEUR(total)}
@@ -185,25 +185,69 @@ export default function SalaryCard({ month, items, onUpdated }) {
               className="px-2 py-3 flex items-center justify-between group"
               data-testid={`incomes-item-${it.id}`}
             >
-              <div className="flex items-center gap-3 min-w-0">
-                <div className="w-1.5 h-1.5 rounded-full bg-emerald-400/80 flex-shrink-0" />
-                {!editingIds.has(it.id) && (
-                  <span className="text-sm truncate">{it.type}</span>
-                )}
-                {editingIds.has(it.id) && (
-                  <input
-                    type="text"
-                    placeholder="E.g. Salary, Bonus..."
-                    value={editType}
-                    onChange={(e) => setEditType(e.target.value)}
-                    className="sm:col-span-3 bg-transparent border border-white/10 rounded-lg px-3 py-2 text-sm focus:border-white outline-none placeholder:text-white/20"
-                    data-testid="fixed-name-input"
-                  />
-                )}
-              </div>
-              <div className="flex items-center gap-3 flex-shrink-0">
-                {!editingIds.has(it.id) && (
-                  <>
+              {editingIds.has(it.id) && (
+                <div
+                  className="mt-5 p-4 border border-white/10 rounded-xl bg-white/[0.02] w-full sm:flex sm:gap-3"
+                  data-testid="edit-fixed-form"
+                >
+                  <div className="grid grid-cols-1 sm:grid-cols-5 gap-3">
+                    <input
+                      autoFocus
+                      type="text"
+                      placeholder="E.g. Salary, Bonus..."
+                      value={editType}
+                      onChange={(e) => setEditType(e.target.value)}
+                      className="sm:col-span-3 bg-transparent border border-white/10 rounded-lg px-3 py-2 text-sm focus:border-white outline-none placeholder:text-white/20"
+                      data-testid="fixed-name-input"
+                    />
+                    <input
+                      type="number"
+                      step="0.01"
+                      min="0"
+                      placeholder="€ 0,00"
+                      value={editAmount}
+                      onChange={(e) => setEditAmount(e.target.value)}
+                      onKeyDown={(e) => e.key === "Enter" && save()}
+                      className="sm:col-span-2 bg-transparent border border-white/10 rounded-lg px-3 py-2 text-sm font-mono-num focus:border-white outline-none placeholder:text-white/20"
+                      data-testid="fixed-amount-input"
+                    />
+                  </div>
+                  <div className="flex gap-2 justify-end mt-2 sm:mt-0">
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setEditingIds((s) => {
+                          const next = new Set(s);
+                          next.delete(it.id);
+                          return next;
+                        });
+                        setEditType("");
+                        setEditAmount("");
+                      }}
+                      className="text-sm text-neutral-400 hover:text-white px-3 py-1.5 inline-flex items-center gap-1"
+                      data-testid="fixed-cancel-button"
+                    >
+                      <X className="w-3.5 h-3.5" /> Cancel
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => edit(it.id)}
+                      disabled={saving}
+                      className="bg-white text-black font-medium text-sm px-4 py-1.5 rounded-full hover:bg-neutral-200 transition-colors active:scale-95 disabled:opacity-50 inline-flex items-center gap-1"
+                      data-testid="fixed-save-button"
+                    >
+                      <Check className="w-3.5 h-3.5" /> Update
+                    </button>
+                  </div>
+                </div>
+              )}
+              {!editingIds.has(it.id) && (
+                <>
+                  <div className="flex items-center gap-3 min-w-0">
+                    <div className="w-1.5 h-1.5 rounded-full bg-emerald-400/80 flex-shrink-0" />
+                    <span className="text-sm truncate">{it.type}</span>
+                  </div>
+                  <div className="flex items-center gap-3 flex-shrink-0">
                     <span className="font-mono-num text-sm text-neutral-300">
                       {formatEUR(it.amount)}
                     </span>
@@ -214,7 +258,7 @@ export default function SalaryCard({ month, items, onUpdated }) {
                         setEditType(it.type);
                         setEditAmount(it.amount);
                       }}
-                      className="opacity-0 group-hover:opacity-100 text-neutral-500 hover:text-emerald-400 transition-all disabled:opacity-40 disabled:cursor-not-allowed"
+                      className="sm:opacity-0 sm:group-hover:opacity-100 text-emerald-400 sm:text-neutral-500 sm:hover:text-emerald-400 transition-all disabled:opacity-40 disabled:cursor-not-allowed"
                       data-testid={`incomes-edit-${it.id}`}
                       aria-label="Edit"
                     >
@@ -224,57 +268,15 @@ export default function SalaryCard({ month, items, onUpdated }) {
                       type="button"
                       onClick={() => remove(it.id)}
                       disabled={deletingIds.has(it.id)}
-                      className="opacity-0 group-hover:opacity-100 text-neutral-500 hover:text-red-400 transition-all disabled:opacity-40 disabled:cursor-not-allowed"
+                      className="sm:opacity-0 sm:group-hover:opacity-100 text-red-400 sm:text-neutral-500 sm:hover:text-red-400 transition-all disabled:opacity-40 disabled:cursor-not-allowed"
                       data-testid={`incomes-delete-${it.id}`}
                       aria-label="Delete"
                     >
                       <Trash2 className="w-3.5 h-3.5" />
                     </button>
-                  </>
-                )}
-                {editingIds.has(it.id) && (
-                  <>
-                    <input
-                      autoFocus
-                      type="number"
-                      step="0.01"
-                      min="0"
-                      placeholder="€ 0,00"
-                      value={editAmount}
-                      onChange={(e) => setEditAmount(e.target.value)}
-                      onKeyDown={(e) => e.key === "Enter" && edit(it.id)}
-                      className="sm:col-span-2 bg-transparent border border-white/10 rounded-lg px-3 py-2 text-sm font-mono-num focus:border-white outline-none placeholder:text-white/20"
-                      data-testid="fixed-amount-input"
-                    />
-                    <button
-                      type="button"
-                      onClick={() => {
-                        setEditingIds((s) => {
-                          const next = new Set(s);
-                          next.delete(it.id);
-                          return next;
-                        });
-                        setEditType('');
-                        setEditAmount('');
-                      }}
-                      className="text-neutral-500 hover:text-red-400 transition-all"
-                      data-testid={`incomes-edit-${it.id}`}
-                      aria-label="Cancel"
-                    >
-                      <X className="w-3.5 h-3.5" />
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => edit(it.id)}
-                      className="text-neutral-500 hover:text-emerald-400 transition-all"
-                      data-testid={`incomes-edit-${it.id}`}
-                      aria-label="Edit"
-                    >
-                      <Check className="w-3.5 h-3.5" />
-                    </button>
-                  </>
-                )}
-              </div>
+                  </div>
+                </>
+              )}
             </li>
           ))}
         </ul>

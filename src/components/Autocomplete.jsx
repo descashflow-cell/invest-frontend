@@ -5,6 +5,7 @@ export default function Autocomplete({
   valueFrom,
   onChange,
   placeholder = "Cerca...",
+  autoFocus = false,
 }) {
   const wrapperRef = useRef(null);
 
@@ -40,6 +41,7 @@ export default function Autocomplete({
   return (
     <div ref={wrapperRef} className="sm:col-span-4 relative">
       <input
+        autoFocus={autoFocus}
         type="text"
         placeholder={placeholder}
         value={value}

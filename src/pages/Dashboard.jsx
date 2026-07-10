@@ -40,7 +40,11 @@ export default function Dashboard() {
   });
   const [month, setMonth] = useState(() => monthKey(new Date()));
   const [data, setData] = useState(null);
-  const [categories, setCategories] = useState({ extra_categories: [], fixed_names: [], investments_names: [] });
+  const [categories, setCategories] = useState({
+    extra_categories: [],
+    fixed_names: [],
+    investments_names: [],
+  });
   const [loading, setLoading] = useState(true);
   const [monthlyPortfolioRefresh, setMonthlyPortfolioRefresh] = useState(0);
   const [portfolioRefresh, setPortfolioRefresh] = useState(0);
@@ -117,9 +121,7 @@ export default function Dashboard() {
       <main
         className={`${navCollapsed ? "lg:ml-[72px]" : "lg:ml-[240px]"} transition-[margin] duration-300 ease-out px-4 sm:px-8 lg:px-12 py-8 sm:py-12 max-w-[1400px]`}
       >
-        {loading && (
-          <FullscreenLoader />
-        )}
+        {loading && <FullscreenLoader />}
         {!loading && (
           <>
             <header className="flex flex-col sm:flex-row sm:justify-between sm:items-end gap-6 mb-10 sm:mb-12">
@@ -127,7 +129,7 @@ export default function Dashboard() {
                 <p className="text-[10px] sm:text-xs uppercase tracking-[0.25em] font-bold text-neutral-500 mb-3">
                   {t.kicker}
                 </p>
-                <h1 className="font-display text-5xl sm:text-6xl tracking-tighter font-light leading-none">
+                <h1 className="font-display text-3xl sm:text-6xl tracking-tighter font-light leading-none">
                   {t.title}{" "}
                   <span className="italic text-neutral-400">{t.italic}</span>
                 </h1>
@@ -201,6 +203,7 @@ export default function Dashboard() {
                         suggested={data?.suggested_investable ?? 0}
                         totalMonth={data?.investments_month_total ?? 0}
                         onChanged={onInvestmentChanged}
+                        categories={categories}
                       />
                     </motion.div>
                     <motion.div
@@ -230,7 +233,10 @@ export default function Dashboard() {
                       <PortfolioCard refreshKey={portfolioRefresh} />
                     </motion.div>
                     <motion.div variants={item} className="md:col-span-12">
-                      <InvestmentsList onChanged={onInvestmentListChanged} />
+                      <InvestmentsList
+                        onChanged={onInvestmentListChanged}
+                        categories={categories}
+                      />
                     </motion.div>
                   </>
                 )}
