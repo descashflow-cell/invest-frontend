@@ -29,7 +29,7 @@ export default function BalanceCard({ data, loading }) {
 
       <div className="mt-6">
         <div
-          className={`font-mono-num text-5xl sm:text-6xl tracking-tight leading-none ${positive ? "text-white" : "text-red-400"}`}
+          className={`font-mono-num text-3xl sm:text-6xl tracking-tight leading-none ${positive ? "text-white" : "text-red-400"}`}
           data-testid="balance-amount"
         >
           {loading ? "—" : formatEUR(balance)}

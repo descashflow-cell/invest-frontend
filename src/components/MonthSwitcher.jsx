@@ -5,7 +5,7 @@ export default function MonthSwitcher({ month, onChange }) {
   const isCurrent = month === monthKey(new Date());
 
   return (
-    <div className="flex items-center gap-2" data-testid="month-switcher">
+    <div className="flex items-center gap-2 m-auto sm:m-0" data-testid="month-switcher">
       <button
         type="button"
         onClick={() => onChange(shiftMonth(month, -1))}
