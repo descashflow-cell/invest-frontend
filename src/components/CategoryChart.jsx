@@ -14,7 +14,7 @@ const CustomTooltip = ({ active, payload }) => {
   );
 };
 
-export default function CategoryChart({ byCategory, total }) {
+export default function CategoryChart({ byCategory, total, isFixed }) {
   const hasData = byCategory.length > 0 && total > 0;
 
   return (
@@ -29,7 +29,7 @@ export default function CategoryChart({ byCategory, total }) {
         <div className="font-mono-num text-3xl sm:text-4xl tracking-tight">
           {formatEUR(total)}
         </div>
-        <p className="text-xs text-neutral-500 mt-1">Extra Expenses Distribution</p>
+        <p className="text-xs text-neutral-500 mt-1">{isFixed ? "Fixed Expenses Distribution" : "Extra Expenses Distribution"}</p>
       </div>
 
       {!hasData ? (
