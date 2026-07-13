@@ -174,6 +174,7 @@ export default function Dashboard() {
                         month={month}
                         items={data?.fixed_expenses ?? []}
                         onChanged={onChanged}
+                        categories={categories}
                       />
                     </motion.div>
                     <motion.div
@@ -181,16 +182,28 @@ export default function Dashboard() {
                       className="md:col-span-12 lg:col-span-5"
                     >
                       <CategoryChart
-                        byCategory={data?.by_category ?? []}
-                        total={data?.extra_total ?? 0}
+                        byCategory={data?.fixed_by_category ?? []}
+                        total={data?.fixed_total ?? 0}
+                        isFixed={true}
                       />
                     </motion.div>
-                    <motion.div variants={item} className="md:col-span-12">
+                    <motion.div variants={item} className="md:col-span-12 lg:col-span-7">
                       <ExtraExpensesCard
                         month={month}
                         items={data?.extra_expenses ?? []}
                         onChanged={onChanged}
                         categories={categories}
+                      />
+                    </motion.div>
+                    
+                    <motion.div
+                      variants={item}
+                      className="md:col-span-12 lg:col-span-5"
+                    >
+                      <CategoryChart
+                        byCategory={data?.by_category ?? []}
+                        total={data?.extra_total ?? 0}
+                        isFixed={false}
                       />
                     </motion.div>
                     <motion.div

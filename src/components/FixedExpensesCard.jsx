@@ -9,16 +9,19 @@ import {
 } from "@/lib/api";
 import { formatEUR } from "@/lib/format";
 import { toast } from "sonner";
+import Autocomplete from "@/components/Autocomplete";
 
-export default function FixedExpensesCard({ month, items, onChanged }) {
+export default function FixedExpensesCard({ month, items, onChanged, categories }) {
   const [adding, setAdding] = useState(false);
   const [name, setName] = useState("");
+  const [category, setCategory] = useState("");
   const [amount, setAmount] = useState("");
   const [saving, setSaving] = useState(false);
   const [copying, setCopying] = useState(false);
   const [deletingIds, setDeletingIds] = useState(() => new Set());
   const [editingIds, setEditingIds] = useState(() => new Set());
   const [editName, setEditName] = useState("");
+  const [editCategory, setEditCategory] = useState("");
   const [editAmount, setEditAmount] = useState("");
 
   const total = items.reduce((s, i) => s + i.amount, 0);
@@ -26,18 +29,19 @@ export default function FixedExpensesCard({ month, items, onChanged }) {
   const reset = () => {
     setName("");
     setAmount("");
+    setCategory("");
     setAdding(false);
   };
 
   const save = async () => {
     const num = parseFloat(amount);
-    if (!name.trim() || isNaN(num) || num <= 0) {
-      toast.error("Fill in name and amount");
+    if (!name.trim() || isNaN(num) || num <= 0 || !category.trim()) {
+      toast.error("Fill in name, amount, and category");
       return;
     }
     setSaving(true);
     try {
-      await addFixedExpense(month, { name: name.trim(), amount: num });
+      await addFixedExpense(month, { name: name.trim(), amount: num, category: category.trim() });
       toast.success("Fixed expense added");
       reset();
       onChanged?.();
@@ -78,13 +82,13 @@ export default function FixedExpensesCard({ month, items, onChanged }) {
 
   const edit = async (id) => {
     const num = parseFloat(editAmount);
-    if (isNaN(num) || num < 0 || !editName.trim()) {
-      toast.error("Fill in a valid amount and name");
+    if (isNaN(num) || num < 0 || !editName.trim() || !editCategory.trim()) {
+      toast.error("Fill in a valid amount, name, and category");
       return;
     }
     setSaving(true);
     try {
-      await updateFixedExpense(id, { amount: num, name: editName.trim() });
+      await updateFixedExpense(id, { amount: num, name: editName.trim(), category: editCategory.trim() });
       toast.success("Fixed expense updated");
       setEditingIds((s) => {
         const next = new Set(s);
@@ -196,7 +200,7 @@ export default function FixedExpensesCard({ month, items, onChanged }) {
           className="mt-5 p-4 border border-white/10 rounded-xl bg-white/[0.02]"
           data-testid="add-fixed-form"
         >
-          <div className="grid grid-cols-1 sm:grid-cols-5 gap-3">
+          <div className="grid grid-cols-1 sm:grid-cols-12 gap-3">
             <input
               autoFocus
               type="number"
@@ -206,7 +210,7 @@ export default function FixedExpensesCard({ month, items, onChanged }) {
               value={amount}
               onChange={(e) => setAmount(e.target.value)}
               onKeyDown={(e) => e.key === "Enter" && save()}
-              className="sm:col-span-2 bg-transparent border border-white/10 rounded-lg px-3 py-2 text-sm font-mono-num focus:border-white outline-none placeholder:text-white/20"
+              className="sm:col-span-3 bg-transparent border border-white/10 rounded-lg px-3 py-2 text-sm font-mono-num focus:border-white outline-none placeholder:text-white/20"
               data-testid="fixed-amount-input"
             />
             <input
@@ -214,8 +218,14 @@ export default function FixedExpensesCard({ month, items, onChanged }) {
               placeholder="E.g. Rent, Bills..."
               value={name}
               onChange={(e) => setName(e.target.value)}
-              className="sm:col-span-3 bg-transparent border border-white/10 rounded-lg px-3 py-2 text-sm focus:border-white outline-none placeholder:text-white/20"
+              className="sm:col-span-5 bg-transparent border border-white/10 rounded-lg px-3 py-2 text-sm focus:border-white outline-none placeholder:text-white/20"
               data-testid="fixed-name-input"
+            />
+            <Autocomplete
+              items={categories.fixed_categories}
+              valueFrom={category}
+              onChange={setCategory}
+              placeholder="Category (e.g. food)"
             />
           </div>
           <div className="mt-3 flex gap-2 justify-end">
@@ -263,15 +273,21 @@ export default function FixedExpensesCard({ month, items, onChanged }) {
                   className="mt-5 p-4 border border-white/10 rounded-xl bg-white/[0.02] w-full sm:flex sm:gap-3"
                   data-testid="add-fixed-form"
                 >
-                  <div className="grid grid-cols-1 sm:grid-cols-5 gap-3">
+                  <div className="grid grid-cols-1 sm:grid-cols-12 gap-3">
                     <input
                       autoFocus
                       type="text"
                       placeholder="E.g. Rent, Bills..."
                       value={editName}
                       onChange={(e) => setEditName(e.target.value)}
-                      className="sm:col-span-3 bg-transparent border border-white/10 rounded-lg px-3 py-2 text-sm focus:border-white outline-none placeholder:text-white/20"
+                      className="sm:col-span-5 bg-transparent border border-white/10 rounded-lg px-3 py-2 text-sm focus:border-white outline-none placeholder:text-white/20"
                       data-testid="fixed-name-input"
+                    />
+                    <Autocomplete
+                      items={categories.fixed_categories}
+                      valueFrom={editCategory}
+                      onChange={setEditCategory}
+                      placeholder="Category (e.g. food)"
                     />
                     <input
                       type="number"
@@ -281,7 +297,7 @@ export default function FixedExpensesCard({ month, items, onChanged }) {
                       value={editAmount}
                       onChange={(e) => setEditAmount(e.target.value)}
                       onKeyDown={(e) => e.key === "Enter" && edit(it.id)}
-                      className="sm:col-span-2 bg-transparent border border-white/10 rounded-lg px-3 py-2 text-sm font-mono-num focus:border-white outline-none placeholder:text-white/20"
+                      className="sm:col-span-3 bg-transparent border border-white/10 rounded-lg px-3 py-2 text-sm font-mono-num focus:border-white outline-none placeholder:text-white/20"
                       data-testid="fixed-amount-input"
                     />
                   </div>
@@ -316,9 +332,12 @@ export default function FixedExpensesCard({ month, items, onChanged }) {
               )}
               {!editingIds.has(it.id) && (
                 <>
-                  <div className="flex items-center gap-3 min-w-0">
+                  <div className="flex items-center gap-3 min-w-0 flex-1">
                     <div className="w-1.5 h-1.5 rounded-full bg-red-400/80 flex-shrink-0" />
-                    <span className="text-sm truncate">{it.name}</span>
+                    <span className="text-sm">{it.name}</span>
+                    <span className="text-[10px] uppercase tracking-[0.18em] text-neutral-500 px-2 py-0.5 border border-white/10 rounded-full flex-shrink-0">
+                      {it.category}
+                    </span>
                   </div>
                   <div className="flex items-center gap-3 flex-shrink-0">
                     <span className="font-mono-num text-sm text-neutral-300">
@@ -329,6 +348,7 @@ export default function FixedExpensesCard({ month, items, onChanged }) {
                       onClick={() => {
                         setEditingIds(new Set(editingIds).add(it.id));
                         setEditName(it.name);
+                        setEditCategory(it.category);
                         setEditAmount(it.amount);
                       }}
                       className="sm:opacity-0 group-hover:opacity-100 text-emerald-400 sm:text-neutral-500 sm:hover:text-emerald-400 transition-all disabled:opacity-40 disabled:cursor-not-allowed"
