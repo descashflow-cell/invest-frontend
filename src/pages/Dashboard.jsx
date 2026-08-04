@@ -1,7 +1,7 @@
 import { useEffect, useState, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { toast } from "sonner";
-import { getSummary, getCategories } from "@/lib/api";
+import { getSummary, getCategories, getEtfList } from "@/lib/api";
 import { monthKey } from "@/lib/format";
 import FullscreenLoader from "@/components/FullscreenLoader";
 import MonthSwitcher from "@/components/MonthSwitcher";
@@ -49,12 +49,14 @@ export default function Dashboard() {
   const [monthlyPortfolioRefresh, setMonthlyPortfolioRefresh] = useState(0);
   const [portfolioRefresh, setPortfolioRefresh] = useState(0);
   const [ytdKey, setYtdKey] = useState(0);
+  const [etfList, setEtfList] = useState([]);
 
   const refresh = useCallback(async (m) => {
     setLoading(true);
     try {
       setData(await getSummary(m));
       setCategories(await getCategories());
+      setEtfList(await getEtfList());
     } catch {
       toast.error("Errore nel caricamento dei dati");
     } finally {
@@ -216,7 +218,7 @@ export default function Dashboard() {
                         suggested={data?.suggested_investable ?? 0}
                         totalMonth={data?.investments_month_total ?? 0}
                         onChanged={onInvestmentChanged}
-                        categories={categories}
+                        etfList={etfList}
                       />
                     </motion.div>
                     <motion.div

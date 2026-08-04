@@ -47,3 +47,4 @@ export const getMonthlyPortfolio = (month) => api.get(`/portfolio/${month}`).the
 export const getYtd = (year) => api.get(`/ytd/${year}`).then((r) => r.data);
 export const getInvestmentsList = () => api.get(`/investments-list`).then((r) => r.data);
 export const copyFixedExpense = (month) => api.post(`/fixed-expenses/copy/${month}`).then((r) => r.data);
+export const getEtfList = () => api.get(`/etf-list`).then((r) => r.data);
