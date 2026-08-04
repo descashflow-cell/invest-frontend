@@ -218,7 +218,7 @@ export default function Dashboard() {
                         suggested={data?.suggested_investable ?? 0}
                         totalMonth={data?.investments_month_total ?? 0}
                         onChanged={onInvestmentChanged}
-                        etfList={etfList}
+                        categories={categories}
                       />
                     </motion.div>
                     <motion.div
