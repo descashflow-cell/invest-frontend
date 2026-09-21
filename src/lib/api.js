@@ -48,3 +48,8 @@ export const getYtd = (year) => api.get(`/ytd/${year}`).then((r) => r.data);
 export const getInvestmentsList = () => api.get(`/investments-list`).then((r) => r.data);
 export const copyFixedExpense = (month) => api.post(`/fixed-expenses/copy/${month}`).then((r) => r.data);
 export const getEtfList = () => api.get(`/etf-list`).then((r) => r.data);
+export const transformCsv = (file) => {
+  const formData = new FormData();
+  formData.append("file", file);
+  return api.post(`/transform`, formData, { responseType: "blob" }).then((r) => r.data);
+};
