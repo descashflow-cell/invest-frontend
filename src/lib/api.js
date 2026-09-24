@@ -51,5 +51,8 @@ export const getEtfList = () => api.get(`/etf-list`).then((r) => r.data);
 export const transformCsv = (file) => {
   const formData = new FormData();
   formData.append("file", file);
-  return api.post(`/transform`, formData, { responseType: "blob" }).then((r) => r.data);
+  return api.post(`/transform`, formData, { responseType: "blob" }).then((r) => r.data).catch((err) => {
+    console.error(err);
+    throw err;
+  });
 };
