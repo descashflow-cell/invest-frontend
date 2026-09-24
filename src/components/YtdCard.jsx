@@ -23,6 +23,7 @@ const Tip = ({ active, payload, label }) => {
       <div className="flex justify-between gap-4"><span className="text-emerald-400">Incomes</span><span className="font-mono-num">{formatEUR(d.income)}</span></div>
       <div className="flex justify-between gap-4"><span className="text-red-400">Expenses</span><span className="font-mono-num">{formatEUR(d.expenses)}</span></div>
       <div className="flex justify-between gap-4"><span className="text-sky-400">Invested</span><span className="font-mono-num">{formatEUR(d.invested)}</span></div>
+      <div className="flex justify-between gap-4"><span className="text-yellow-400">Net Revenue</span><span className="font-mono-num">{formatEUR(d.saved)}</span></div>
     </div>
   );
 };
@@ -56,6 +57,7 @@ export default function YtdCard() {
     income: s.income,
     expenses: s.expenses,
     invested: s.invested,
+    saved: s.saved,
   }));
 
   const t = data?.totals ?? { income: 0, expenses: 0, invested: 0, saved: 0, active_months: 0, avg_saved: 0 };
@@ -111,10 +113,11 @@ export default function YtdCard() {
       </div>
 
       {/* KPIs */}
-      <div className="mt-6 grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-4">
+      <div className="mt-6 grid grid-cols-1 sm:grid-cols-4 gap-3 sm:gap-4">
         <Kpi label="Income" value={formatEUR(t.income)} accent="text-emerald-400" testid="ytd-kpi-income" />
         <Kpi label="Expenses" value={formatEUR(t.expenses)} accent="text-red-400" testid="ytd-kpi-expenses" />
         <Kpi label="Invested" value={formatEUR(t.invested)} accent="text-sky-400" testid="ytd-kpi-invested" />
+        <Kpi label="Net Revenue" value={formatEUR(t.saved)} accent="text-yellow-400" testid="ytd-kpi-net-revenue" />
       </div>
 
       {/* Chart */}
@@ -136,6 +139,7 @@ export default function YtdCard() {
               <Bar dataKey="income" name="Income" fill="#10B981" radius={[4, 4, 0, 0]} maxBarSize={28} />
               <Bar dataKey="expenses" name="Expenses" fill="#EF4444" radius={[4, 4, 0, 0]} maxBarSize={28} />
               <Bar dataKey="invested" name="Invested" fill="#38BDF8" radius={[4, 4, 0, 0]} maxBarSize={28} />
+              <Bar dataKey="saved" name="Net Revenue" fill="#FACC15" radius={[4, 4, 0, 0]} maxBarSize={28} />
             </BarChart>
           </ResponsiveContainer>
         )}
@@ -152,7 +156,7 @@ export default function YtdCard() {
                 <p className="text-sm mt-0.5">{monthLabel(best?.month)}</p>
               </div>
             </div>
-            <span className="font-mono-num text-emerald-400">{formatEUR((best?.saved ?? 0) + (data?.series?.find(s => s.month === best?.month)?.invested ?? 0))}</span>
+            <span className="font-mono-num text-emerald-400">{formatEUR(best?.saved ?? 0)}</span>
           </div>
           <div className="border border-white/10 rounded-xl p-4 flex items-center justify-between gap-4" data-testid="ytd-worst">
             <div className="flex items-center gap-3">
@@ -162,7 +166,7 @@ export default function YtdCard() {
                 <p className="text-sm mt-0.5">{monthLabel(worst?.month)}</p>
               </div>
             </div>
-            <span className={`font-mono-num ${((worst?.saved ?? 0) + (data?.series?.find(s => s.month === worst?.month)?.invested ?? 0)) < 0 ? "text-red-400" : "text-neutral-300"}`}>{formatEUR((worst?.saved ?? 0) + (data?.series?.find(s => s.month === worst?.month)?.invested ?? 0))}</span>
+            <span className={`font-mono-num ${(worst?.saved ?? 0) < 0 ? "text-red-400" : "text-neutral-300"}`}>{formatEUR(worst?.saved ?? 0)}</span>
           </div>
         </div>
       )}
