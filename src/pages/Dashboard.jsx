@@ -17,6 +17,7 @@ import YtdCard from "@/components/YtdCard";
 import ProjectionCard from "@/components/ProjectionCard";
 import SideNav from "@/components/SideNav";
 import InvestmentsList from "@/components/InvestmentsList";
+import FileDropZone from "@/components/FileDropZone";
 
 const TITLES = {
   cashflow: {
@@ -50,6 +51,7 @@ export default function Dashboard() {
   const [portfolioRefresh, setPortfolioRefresh] = useState(0);
   const [ytdKey, setYtdKey] = useState(0);
   const [etfList, setEtfList] = useState([]);
+  const [file, setFile] = useState(null);
 
   const refresh = useCallback(async (m) => {
     setLoading(true);
@@ -251,6 +253,13 @@ export default function Dashboard() {
                       <InvestmentsList
                         onChanged={onInvestmentListChanged}
                         categories={categories}
+                      />
+                    </motion.div>
+                    <motion.div variants={item} className="md:col-span-12">
+                      <FileDropZone
+                        label="Carica l'estratto conto Trade Republic"
+                        accept=".csv"
+                        setLoading={setLoading}
                       />
                     </motion.div>
                   </>
