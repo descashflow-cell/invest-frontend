@@ -1,13 +1,23 @@
 import { useEffect, useState } from "react";
 import {
-  BarChart, Bar, XAxis, YAxis, ResponsiveContainer, Tooltip, CartesianGrid, Legend,
+  BarChart, Bar, XAxis, YAxis, ResponsiveContainer, Tooltip, CartesianGrid, Legend, Brush,
 } from "recharts";
-import { ChevronLeft, ChevronRight, Trophy, TrendingDown } from "lucide-react";
+import { ChevronLeft, ChevronRight, Trophy, TrendingDown, ChevronDown } from "lucide-react";
 import { getYtd } from "@/lib/api";
 import { formatEUR } from "@/lib/format";
+import {
+  DropdownMenu,
+  DropdownMenuTrigger,
+  DropdownMenuContent,
+  DropdownMenuItem,
+} from "@/components/ui/dropdown-menu";
 
 const MONTHS_SHORT = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
 const MONTHS_FULL = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+
+const YEARLY_TYPE = {name: "yearly", label: "Yearly"};
+// const DECENNIAL_TYPE = {name: "decennial", label: "Decennial"};
+const ALLTIME_TYPE = {name: "alltime", label: "All Time"};
 
 const fmtAxis = (v) => {
   if (Math.abs(v) >= 1000) return `${(v / 1000).toFixed(1)}k`;
@@ -53,22 +63,24 @@ function Kpi({ label, value, accent, testid, hasCheck, checked, setChecked }) {
 
 export default function YtdCard() {
   const [year, setYear] = useState(() => new Date().getFullYear());
+  const [decade, setDecade] = useState(() => Math.floor(new Date().getFullYear() / 10) * 10);
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [invIncl, setInvIncl] = useState(true);
+  const [filterType, setFilterType] = useState(YEARLY_TYPE);
 
   useEffect(() => {
     let cancelled = false;
     setLoading(true);
-    getYtd(year)
+    getYtd(filterType.name, year)
       .then((d) => { if (!cancelled) setData(d); })
       .catch(() => {})
       .finally(() => { if (!cancelled) setLoading(false); });
     return () => { cancelled = true; };
-  }, [year]);
+  }, [filterType, year]);
 
   const chartData = (data?.series ?? []).map((s, i) => ({
-    label: MONTHS_SHORT[i],
+    label: filterType?.name === YEARLY_TYPE.name ? MONTHS_SHORT[i] : s.month,
     income: s.income,
     expenses: s.expenses,
     invested: s.invested,
@@ -84,6 +96,10 @@ export default function YtdCard() {
     if (!key) return "—";
     const [, m] = key.split("-");
     return MONTHS_FULL[Number(m) - 1];
+  };
+
+  const handleBrushChange = (range) => {
+    console.log(range);
   };
 
   return (
@@ -103,28 +119,56 @@ export default function YtdCard() {
             {t.active_months} {t.active_months === 1 ? "active month" : "active months"} · average monthly invested {formatEUR(t.active_months ? t.invested / t.active_months : 0)}
           </p>
         </div>
-        <div className="flex items-center gap-2" data-testid="year-switcher">
-          <button
-            type="button"
-            onClick={() => setYear((y) => y - 1)}
-            className="w-9 h-9 inline-flex items-center justify-center rounded-full border border-white/10 hover:bg-white/5 transition-colors active:scale-95"
-            data-testid="year-prev"
-            aria-label="Previous year"
-          >
-            <ChevronLeft className="w-4 h-4" />
-          </button>
-          <div className="px-4 h-9 inline-flex items-center rounded-full border border-white/10 bg-white/[0.02] font-mono-num text-sm" data-testid="year-label">
-            {year}
+        <div className="flex gap-4">
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <button className="px-4 py-2 rounded-full border border-white/10 bg-white/[0.02] text-white inline-flex items-center justify-center gap-1">
+                {filterType?.label ?? "Select Type"}
+                <ChevronDown className="w-4 h-4" />
+              </button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent>
+              {[YEARLY_TYPE, ALLTIME_TYPE].map((type) => (
+                <DropdownMenuItem key={type.name} onSelect={() => {
+                  setFilterType(type);
+                  if(type.name === ALLTIME_TYPE.name) {
+                    setYear(new Date().getFullYear());
+                  }
+                }}>
+                  {type.label}
+                </DropdownMenuItem>
+              ))}
+            </DropdownMenuContent>
+          </DropdownMenu>
+          <div className="flex items-center gap-2" data-testid="year-switcher">
+            {filterType?.name !== ALLTIME_TYPE.name && 
+              <button
+                type="button"
+                onClick={() => setYear((y) => y - 1)}
+                className="w-9 h-9 font-mono-num text-sm inline-flex items-center justify-center rounded-full border border-white/10 hover:bg-white/5 transition-colors active:scale-95 disabled:cursor-not-allowed disabled:opacity-50"
+                data-testid="year-prev"
+                aria-label="Previous year"
+                disabled={year <= 2000}
+              >
+                <ChevronLeft className="w-4 h-4" />
+              </button>
+            }
+            <div className="px-4 h-9 inline-flex items-center rounded-full border border-white/10 bg-white/[0.02] font-mono-num text-sm" data-testid="year-label">
+              {filterType?.name === YEARLY_TYPE.name ? year : `Up to ${new Date().getFullYear()}`}
+            </div>
+            {filterType?.name !== ALLTIME_TYPE.name && 
+              <button
+                type="button"
+                onClick={() => setYear((y) => y + 1)}
+                className="w-9 h-9 inline-flex items-center justify-center rounded-full border border-white/10 hover:bg-white/5 transition-colors active:scale-95 disabled:cursor-not-allowed disabled:opacity-50"
+                data-testid="year-next"
+                aria-label="Next year"
+                disabled={year >= 2100}
+              >
+                <ChevronRight className="w-4 h-4" />
+              </button>
+            }
           </div>
-          <button
-            type="button"
-            onClick={() => setYear((y) => y + 1)}
-            className="w-9 h-9 inline-flex items-center justify-center rounded-full border border-white/10 hover:bg-white/5 transition-colors active:scale-95"
-            data-testid="year-next"
-            aria-label="Next year"
-          >
-            <ChevronRight className="w-4 h-4" />
-          </button>
         </div>
       </div>
 
@@ -152,10 +196,18 @@ export default function YtdCard() {
                 iconType="circle"
                 formatter={(v) => <span className="text-neutral-400">{v}</span>}
               />
-              <Bar dataKey="income" name="Income" fill="#10B981" radius={[4, 4, 0, 0]} maxBarSize={28} />
-              <Bar dataKey="expenses" name="Expenses" fill="#EF4444" radius={[4, 4, 0, 0]} maxBarSize={28} />
-              <Bar dataKey="invested" name="Invested" fill="#38BDF8" radius={[4, 4, 0, 0]} maxBarSize={28} />
-              <Bar dataKey={invIncl ? "saved" : "balance"} name="Net Revenue" fill="#FACC15" radius={[4, 4, 0, 0]} maxBarSize={28} />
+              <Bar dataKey="income" name="Income" fill="#10B981" radius={[4, 4, 0, 0]} barSize={17} />
+              <Bar dataKey="expenses" name="Expenses" fill="#EF4444" radius={[4, 4, 0, 0]} barSize={17} />
+              <Bar dataKey="invested" name="Invested" fill="#38BDF8" radius={[4, 4, 0, 0]} barSize={17} />
+              <Bar dataKey={invIncl ? "saved" : "balance"} name="Net Revenue" fill="#FACC15" radius={[4, 4, 0, 0]} barSize={17} />
+              {filterType?.name === ALLTIME_TYPE.name && chartData.length > 10 && (
+                <Brush
+                dataKey="label"
+                height={30}
+                startIndex={chartData.length - 10}
+                endIndex={chartData.length - 1}
+                onDragEnd={handleBrushChange}
+              />)}
             </BarChart>
           </ResponsiveContainer>
         )}
@@ -168,8 +220,8 @@ export default function YtdCard() {
             <div className="flex items-center gap-3">
               <Trophy className="w-4 h-4 text-emerald-400 flex-shrink-0" />
               <div>
-                <p className="text-[10px] uppercase tracking-[0.2em] font-bold text-neutral-500">Best month · balance</p>
-                <p className="text-sm mt-0.5">{monthLabel(best?.month)}</p>
+                <p className="text-[10px] uppercase tracking-[0.2em] font-bold text-neutral-500">Best {filterType?.name == ALLTIME_TYPE.name ? "year" : "month"} · balance</p>
+                <p className="text-sm mt-0.5">{filterType?.name == ALLTIME_TYPE.name ? best?.month : monthLabel(best?.month)}</p>
               </div>
             </div>
             <span className="font-mono-num text-emerald-400">{formatEUR(invIncl ? best?.saved ?? 0 : best?.balance ?? 0)}</span>
@@ -178,8 +230,8 @@ export default function YtdCard() {
             <div className="flex items-center gap-3">
               <TrendingDown className="w-4 h-4 text-red-400 flex-shrink-0" />
               <div>
-                <p className="text-[10px] uppercase tracking-[0.2em] font-bold text-neutral-500">Worst month · balance</p>
-                <p className="text-sm mt-0.5">{monthLabel(worst?.month)}</p>
+                <p className="text-[10px] uppercase tracking-[0.2em] font-bold text-neutral-500">Worst {filterType?.name == ALLTIME_TYPE.name ? "year" : "month"} · balance</p>
+                <p className="text-sm mt-0.5">{filterType?.name == ALLTIME_TYPE.name ? worst?.month : monthLabel(worst?.month)}</p>
               </div>
             </div>
             <span className={`font-mono-num ${(worst?.saved ?? 0) < 0 ? "text-red-400" : "text-neutral-300"}`}>{formatEUR(invIncl ? worst?.saved ?? 0 : worst?.balance ?? 0)}</span>

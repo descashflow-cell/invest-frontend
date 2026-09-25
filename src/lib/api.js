@@ -44,7 +44,7 @@ export const updateInvestment = (id, data) => api.put(`/investments/${id}`, data
 export const deleteInvestment = (id) => api.delete(`/investments/${id}`).then((r) => r.data);
 export const getPortfolio = () => api.get(`/portfolio`).then((r) => r.data);
 export const getMonthlyPortfolio = (month) => api.get(`/portfolio/${month}`).then((r) => r.data);
-export const getYtd = (year) => api.get(`/ytd/${year}`).then((r) => r.data);
+export const getYtd = (filterType, year) => api.get(`/ytd/${filterType}/${year}`).then((r) => r.data);
 export const getInvestmentsList = () => api.get(`/investments-list`).then((r) => r.data);
 export const copyFixedExpense = (month) => api.post(`/fixed-expenses/copy/${month}`).then((r) => r.data);
 export const getEtfList = () => api.get(`/etf-list`).then((r) => r.data);
