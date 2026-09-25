@@ -14,7 +14,7 @@ const fmtAxis = (v) => {
   return `${v}`;
 };
 
-const Tip = ({ active, payload, label }) => {
+const Tip = ({ active, payload, label, invIncl }) => {
   if (!active || !payload || !payload.length) return null;
   const d = payload[0].payload;
   return (
@@ -23,12 +23,26 @@ const Tip = ({ active, payload, label }) => {
       <div className="flex justify-between gap-4"><span className="text-emerald-400">Incomes</span><span className="font-mono-num">{formatEUR(d.income)}</span></div>
       <div className="flex justify-between gap-4"><span className="text-red-400">Expenses</span><span className="font-mono-num">{formatEUR(d.expenses)}</span></div>
       <div className="flex justify-between gap-4"><span className="text-sky-400">Invested</span><span className="font-mono-num">{formatEUR(d.invested)}</span></div>
-      <div className="flex justify-between gap-4"><span className="text-yellow-400">Net Revenue</span><span className="font-mono-num">{formatEUR(d.saved)}</span></div>
+      <div className="flex justify-between gap-4"><span className="text-yellow-400">Net Revenue</span><span className="font-mono-num">{formatEUR(invIncl ? d.saved : d.balance)}</span></div>
     </div>
   );
 };
 
-function Kpi({ label, value, accent, testid }) {
+function Kpi({ label, value, accent, testid, hasCheck, checked, setChecked }) {
+  if(hasCheck) {
+    return (
+      <div className="border border-white/10 rounded-xl p-4 sm:p-5 bg-white/[0.02] flex gap-4" data-testid={testid}>
+        <div>
+          <p className="text-[10px] uppercase tracking-[0.2em] font-bold text-neutral-500 mb-2">{label}</p>
+          <div className={`font-mono-num text-xl sm:text-2xl tracking-tight ${accent || "text-white"}`}>{value}</div>
+        </div>
+        <div className="flex items-center mb-4 gap-2">
+          <input id="default-checkbox" type="checkbox" checked={checked} onChange={(e) => setChecked(e.target.checked)} className="w-4 h-4 border border-default-medium rounded-xs bg-neutral-secondary-medium" />
+          <label htmlFor="default-checkbox" className="select-none ms-2 text-sm font-medium text-heading">Investment included</label>
+        </div>
+      </div>
+    );
+  }
   return (
     <div className="border border-white/10 rounded-xl p-4 sm:p-5 bg-white/[0.02]" data-testid={testid}>
       <p className="text-[10px] uppercase tracking-[0.2em] font-bold text-neutral-500 mb-2">{label}</p>
@@ -41,6 +55,7 @@ export default function YtdCard() {
   const [year, setYear] = useState(() => new Date().getFullYear());
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [invIncl, setInvIncl] = useState(true);
 
   useEffect(() => {
     let cancelled = false;
@@ -58,6 +73,7 @@ export default function YtdCard() {
     expenses: s.expenses,
     invested: s.invested,
     saved: s.saved,
+    balance: s.balance,
   }));
 
   const t = data?.totals ?? { income: 0, expenses: 0, invested: 0, saved: 0, active_months: 0, avg_saved: 0 };
@@ -114,10 +130,10 @@ export default function YtdCard() {
 
       {/* KPIs */}
       <div className="mt-6 grid grid-cols-1 sm:grid-cols-4 gap-3 sm:gap-4">
-        <Kpi label="Income" value={formatEUR(t.income)} accent="text-emerald-400" testid="ytd-kpi-income" />
-        <Kpi label="Expenses" value={formatEUR(t.expenses)} accent="text-red-400" testid="ytd-kpi-expenses" />
-        <Kpi label="Invested" value={formatEUR(t.invested)} accent="text-sky-400" testid="ytd-kpi-invested" />
-        <Kpi label="Net Revenue" value={formatEUR(t.saved)} accent="text-yellow-400" testid="ytd-kpi-net-revenue" />
+        <Kpi label="Income" value={formatEUR(t.income)} accent="text-emerald-400" testid="ytd-kpi-income" hasCheck={false}/>
+        <Kpi label="Expenses" value={formatEUR(t.expenses)} accent="text-red-400" testid="ytd-kpi-expenses" hasCheck={false} />
+        <Kpi label="Invested" value={formatEUR(t.invested)} accent="text-sky-400" testid="ytd-kpi-invested" hasCheck={true} checked={invIncl} setChecked={setInvIncl} />
+        <Kpi label="Net Revenue" value={formatEUR(invIncl ? t.saved : t.balance)} accent="text-yellow-400" testid="ytd-kpi-net-revenue" hasCheck={false} />
       </div>
 
       {/* Chart */}
@@ -130,7 +146,7 @@ export default function YtdCard() {
               <CartesianGrid strokeDasharray="2 4" stroke="rgba(255,255,255,0.05)" vertical={false} />
               <XAxis dataKey="label" stroke="#525252" tick={{ fontSize: 11, fill: "#737373" }} tickLine={false} axisLine={false} />
               <YAxis stroke="#525252" tick={{ fontSize: 10, fill: "#737373" }} tickFormatter={fmtAxis} tickLine={false} axisLine={false} width={48} />
-              <Tooltip content={<Tip />} cursor={{ fill: "rgba(255,255,255,0.03)" }} />
+              <Tooltip content={<Tip invIncl={invIncl} />} cursor={{ fill: "rgba(255,255,255,0.03)" }} />
               <Legend
                 wrapperStyle={{ paddingTop: 8, fontSize: 11 }}
                 iconType="circle"
@@ -139,7 +155,7 @@ export default function YtdCard() {
               <Bar dataKey="income" name="Income" fill="#10B981" radius={[4, 4, 0, 0]} maxBarSize={28} />
               <Bar dataKey="expenses" name="Expenses" fill="#EF4444" radius={[4, 4, 0, 0]} maxBarSize={28} />
               <Bar dataKey="invested" name="Invested" fill="#38BDF8" radius={[4, 4, 0, 0]} maxBarSize={28} />
-              <Bar dataKey="saved" name="Net Revenue" fill="#FACC15" radius={[4, 4, 0, 0]} maxBarSize={28} />
+              <Bar dataKey={invIncl ? "saved" : "balance"} name="Net Revenue" fill="#FACC15" radius={[4, 4, 0, 0]} maxBarSize={28} />
             </BarChart>
           </ResponsiveContainer>
         )}
@@ -156,7 +172,7 @@ export default function YtdCard() {
                 <p className="text-sm mt-0.5">{monthLabel(best?.month)}</p>
               </div>
             </div>
-            <span className="font-mono-num text-emerald-400">{formatEUR(best?.saved ?? 0)}</span>
+            <span className="font-mono-num text-emerald-400">{formatEUR(invIncl ? best?.saved ?? 0 : best?.balance ?? 0)}</span>
           </div>
           <div className="border border-white/10 rounded-xl p-4 flex items-center justify-between gap-4" data-testid="ytd-worst">
             <div className="flex items-center gap-3">
@@ -166,7 +182,7 @@ export default function YtdCard() {
                 <p className="text-sm mt-0.5">{monthLabel(worst?.month)}</p>
               </div>
             </div>
-            <span className={`font-mono-num ${(worst?.saved ?? 0) < 0 ? "text-red-400" : "text-neutral-300"}`}>{formatEUR(worst?.saved ?? 0)}</span>
+            <span className={`font-mono-num ${(worst?.saved ?? 0) < 0 ? "text-red-400" : "text-neutral-300"}`}>{formatEUR(invIncl ? worst?.saved ?? 0 : worst?.balance ?? 0)}</span>
           </div>
         </div>
       )}
