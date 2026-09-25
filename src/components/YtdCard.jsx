@@ -11,6 +11,7 @@ import {
   DropdownMenuContent,
   DropdownMenuItem,
 } from "@/components/ui/dropdown-menu";
+import CustomChart from "./CustomChart";
 
 const MONTHS_SHORT = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
 const MONTHS_FULL = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
@@ -63,7 +64,6 @@ function Kpi({ label, value, accent, testid, hasCheck, checked, setChecked }) {
 
 export default function YtdCard() {
   const [year, setYear] = useState(() => new Date().getFullYear());
-  const [decade, setDecade] = useState(() => Math.floor(new Date().getFullYear() / 10) * 10);
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [invIncl, setInvIncl] = useState(true);
@@ -96,10 +96,6 @@ export default function YtdCard() {
     if (!key) return "—";
     const [, m] = key.split("-");
     return MONTHS_FULL[Number(m) - 1];
-  };
-
-  const handleBrushChange = (range) => {
-    console.log(range);
   };
 
   return (
@@ -185,31 +181,38 @@ export default function YtdCard() {
         {loading ? (
           <div className="h-full flex items-center justify-center text-sm text-neutral-600">—</div>
         ) : (
-          <ResponsiveContainer width="100%" height="100%">
-            <BarChart data={chartData} margin={{ top: 12, right: 0, bottom: 0, left: -10 }}>
-              <CartesianGrid strokeDasharray="2 4" stroke="rgba(255,255,255,0.05)" vertical={false} />
-              <XAxis dataKey="label" stroke="#525252" tick={{ fontSize: 11, fill: "#737373" }} tickLine={false} axisLine={false} />
-              <YAxis stroke="#525252" tick={{ fontSize: 10, fill: "#737373" }} tickFormatter={fmtAxis} tickLine={false} axisLine={false} width={48} />
-              <Tooltip content={<Tip invIncl={invIncl} />} cursor={{ fill: "rgba(255,255,255,0.03)" }} />
-              <Legend
-                wrapperStyle={{ paddingTop: 8, fontSize: 11 }}
-                iconType="circle"
-                formatter={(v) => <span className="text-neutral-400">{v}</span>}
-              />
-              <Bar dataKey="income" name="Income" fill="#10B981" radius={[4, 4, 0, 0]} barSize={17} />
-              <Bar dataKey="expenses" name="Expenses" fill="#EF4444" radius={[4, 4, 0, 0]} barSize={17} />
-              <Bar dataKey="invested" name="Invested" fill="#38BDF8" radius={[4, 4, 0, 0]} barSize={17} />
-              <Bar dataKey={invIncl ? "saved" : "balance"} name="Net Revenue" fill="#FACC15" radius={[4, 4, 0, 0]} barSize={17} />
-              {filterType?.name === ALLTIME_TYPE.name && chartData.length > 10 && (
-                <Brush
-                dataKey="label"
-                height={30}
-                startIndex={chartData.length - 10}
-                endIndex={chartData.length - 1}
-                onDragEnd={handleBrushChange}
-              />)}
-            </BarChart>
-          </ResponsiveContainer>
+          // <ResponsiveContainer width="100%" height="100%">
+          //   <BarChart data={chartData} margin={{ top: 12, right: 0, bottom: 0, left: -10 }}>
+          //     <CartesianGrid strokeDasharray="2 4" stroke="rgba(255,255,255,0.05)" vertical={false} />
+          //     <XAxis dataKey="label" stroke="#525252" tick={{ fontSize: 11, fill: "#737373" }} tickLine={false} axisLine={false} />
+          //     <YAxis stroke="#525252" tick={{ fontSize: 10, fill: "#737373" }} tickFormatter={fmtAxis} tickLine={false} axisLine={false} width={48} />
+          //     <Tooltip content={<Tip invIncl={invIncl} />} cursor={{ fill: "rgba(255,255,255,0.03)" }} />
+          //     <Legend
+          //       wrapperStyle={{ paddingTop: 8, fontSize: 11 }}
+          //       iconType="circle"
+          //       formatter={(v) => <span className="text-neutral-400">{v}</span>}
+          //     />
+          //     <Bar dataKey="income" name="Income" fill="#10B981" radius={[4, 4, 0, 0]} barSize={17} />
+          //     <Bar dataKey="expenses" name="Expenses" fill="#EF4444" radius={[4, 4, 0, 0]} barSize={17} />
+          //     <Bar dataKey="invested" name="Invested" fill="#38BDF8" radius={[4, 4, 0, 0]} barSize={17} />
+          //     <Bar dataKey={invIncl ? "saved" : "balance"} name="Net Revenue" fill="#FACC15" radius={[4, 4, 0, 0]} barSize={17} />
+          //     {filterType?.name === ALLTIME_TYPE.name && chartData.length > 10 && (
+          //       <Brush
+          //       dataKey="label"
+          //       height={30}
+          //       startIndex={chartData.length - 10}
+          //       endIndex={chartData.length - 1}
+          //     />)}
+          //   </BarChart>
+          // </ResponsiveContainer>
+          <CustomChart
+            chartData={chartData}
+            filterType={filterType}
+            invIncl={invIncl}
+            fmtAxis={fmtAxis}
+            Tip={Tip}
+            ALLTIME_TYPE={ALLTIME_TYPE}
+          />
         )}
       </div>
 

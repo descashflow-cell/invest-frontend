@@ -62,6 +62,12 @@ export default function SideNav({ active, onChange, collapsed, onToggleCollapsed
       {openMobile && (
         <div className="lg:hidden border-b border-white/5 bg-[#0A0A0A] p-4 space-y-2 sticky top-14 z-30" data-testid="nav-mobile">
           {ITEMS.map((it) => <Link key={it.id} it={it} />)}
+          <div className="mt-6 pt-6 px-3 py-3 border-t border-white/5">
+            <p className="text-[10px] uppercase tracking-[0.2em] text-neutral-600 truncate mb-2" data-testid="user-email">{user?.email}</p>
+            <button type="button" onClick={logout} className="text-xs text-neutral-400 hover:text-white inline-flex items-center gap-1.5 transition-colors" data-testid="logout-button">
+              <LogOut className="w-3.5 h-3.5" /> Esci
+            </button>
+          </div>
         </div>
       )}
 
